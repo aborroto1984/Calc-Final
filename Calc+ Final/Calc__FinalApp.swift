@@ -11,7 +11,7 @@ import SwiftUI
 struct Calc__FinalApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            BubbleLevelView(detector: MotionDetector())
         }
     }
 }
