@@ -15,6 +15,7 @@
 		8917846F290490AB00A78D23 /* Calc__FinalUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917846E290490AB00A78D23 /* Calc__FinalUITests.swift */; };
 		89178471290490AB00A78D23 /* Calc__FinalUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89178470290490AB00A78D23 /* Calc__FinalUITestsLaunchTests.swift */; };
 		8917847E2904925D00A78D23 /* MotionDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917847D2904925D00A78D23 /* MotionDetector.swift */; };
+		891784812905D50500A78D23 /* Calculator view.swift in Sources */ = {isa = PBXBuildFile; fileRef = 891784802905D50500A78D23 /* Calculator view.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		89178470290490AB00A78D23 /* Calc__FinalUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calc__FinalUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		8917847D2904925D00A78D23 /* MotionDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionDetector.swift; sourceTree = "<group>"; };
 		8917847F2904B61500A78D23 /* Calc--Final-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Calc--Final-Info.plist"; sourceTree = SOURCE_ROOT; };
+		891784802905D50500A78D23 /* Calculator view.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calculator view.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 				89178455290490AA00A78D23 /* BubbleLevelView.swift */,
 				89178457290490AB00A78D23 /* Assets.xcassets */,
 				89178459290490AB00A78D23 /* Preview Content */,
+				891784802905D50500A78D23 /* Calculator view.swift */,
 			);
 			path = "Calc+ Final";
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				89178456290490AA00A78D23 /* BubbleLevelView.swift in Sources */,
+				891784812905D50500A78D23 /* Calculator view.swift in Sources */,
 				89178454290490AA00A78D23 /* Calc__FinalApp.swift in Sources */,
 				8917847E2904925D00A78D23 /* MotionDetector.swift in Sources */,
 			);
