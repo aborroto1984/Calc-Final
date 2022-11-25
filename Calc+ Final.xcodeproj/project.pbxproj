@@ -102,10 +102,9 @@
 				8917847F2904B61500A78D23 /* Calc--Final-Info.plist */,
 				89178453290490AA00A78D23 /* Calc__FinalApp.swift */,
 				8917847D2904925D00A78D23 /* MotionDetector.swift */,
-				89178455290490AA00A78D23 /* BubbleLevelView.swift */,
+				89F9AF67291B210500B3D020 /* Views */,
 				89178457290490AB00A78D23 /* Assets.xcassets */,
 				89178459290490AB00A78D23 /* Preview Content */,
-				891784802905D50500A78D23 /* Calculator view.swift */,
 			);
 			path = "Calc+ Final";
 			sourceTree = "<group>";
@@ -133,6 +132,23 @@
 				89178470290490AB00A78D23 /* Calc__FinalUITestsLaunchTests.swift */,
 			);
 			path = "Calc+ FinalUITests";
+			sourceTree = "<group>";
+		};
+		89F9AF67291B210500B3D020 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				89F9AF68291B213100B3D020 /* Component */,
+				891784802905D50500A78D23 /* Calculator view.swift */,
+				89178455290490AA00A78D23 /* BubbleLevelView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		89F9AF68291B213100B3D020 /* Component */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Component;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
