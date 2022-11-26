@@ -7,49 +7,73 @@
 
 import SwiftUI
 
-
 struct Calculator_view: View {
     
     @StateObject var detector: MotionDetector
+    @State var clearAll = false
+    @State var upValue = "0"
+    @State var value = "0"
     
     var body: some View {
     
             VStack{
-    
-                ZStack{
-                    Image("header")
-                        .resizable()
-                        .edgesIgnoringSafeArea(.all)
-                        .frame(width: .infinity, height: 100)
-                        .scaledToFill()
-                        .position()
+    // Header
+                //ZStack{
+//                    Image("header")
+//                        .resizable()
+//                        .edgesIgnoringSafeArea(.all)
+//                        .frame(width: .infinity, height: 100)
+//                        .scaledToFill()
+//                        .position()
                         
                     
                     
-                    VStack{
+                    //VStack{
                         ZStack{
-//                            NavigationLink(destination: BubbleLevelView(detector: detector)) {
-//                                Image("menu")
-                            HStack{}
-                            Image("menu")
-                            
-                        
-                            
+
+                            HStack{
+                                Image("menu").padding(.leading)
+                                Spacer()
+                                
+                            }
+
                             Text("Calculator")
-//                                .frame(maxWidth: .infinity, alignment: .center)
+
                                 .font(.largeTitle).foregroundColor(.black)
                             
                             
                             
                         }
+                
+                        
+                    //}
+                    
+                    
+                //}
+    // Screen
+                VStack{
+                    Spacer()
+                    
+                    HStack{
                         Spacer()
+                        Text(self.upValue)
+                            
+                            .font(.system(size: 35))
+                            .padding()
                     }
                     
+                    Spacer()
                     
+                    HStack{
+                        Spacer()
+                        Text(self.value)
+                            .bold()
+                            .font(.system(size: 70))
+                            .padding()
+                    }
                 }
                 
-                Spacer()
-                
+    // Buttons
                 HStack{
                     
                     Button(action: {
@@ -74,7 +98,7 @@ struct Calculator_view: View {
                 }
                 
                 HStack{
-                    Button(action: {
+                    Button(action: {clear()
                         
                     }, label: {Image("clearButton").resizable().scaledToFit()})
                     
@@ -86,7 +110,7 @@ struct Calculator_view: View {
                         
                     }, label: {Image("percentButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "÷")
                         
                     }, label: {Image("divideButton").resizable().scaledToFit()})
                     
@@ -96,19 +120,19 @@ struct Calculator_view: View {
                 }
                 
                 HStack{
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "7")
                         
                     }, label: {Image("sevenButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "8")
                         
                     }, label: {Image("eightButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "9")
                         
                     }, label: {Image("nineButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "×")
                         
                     }, label: {Image("multiplyButton").resizable().scaledToFit()})
                     
@@ -118,19 +142,19 @@ struct Calculator_view: View {
                 }
                 
                 HStack{
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "4")
                         
                     }, label: {Image("fourButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "5")
                         
                     }, label: {Image("fiveButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "6")
                         
                     }, label: {Image("sixButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "−")
                         
                     }, label: {Image("minusButton").resizable().scaledToFit()})
                     
@@ -140,19 +164,19 @@ struct Calculator_view: View {
                 }
                 
                 HStack{
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "1")
                         
                     }, label: {Image("oneButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "2")
                         
                     }, label: {Image("twoButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "3")
                         
                     }, label: {Image("threeButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {opperation(opp: "+")
                         
                     }, label: {Image("plusButton").resizable().scaledToFit()})
                     
@@ -162,15 +186,15 @@ struct Calculator_view: View {
                 }
                 
                 HStack{
-                    Button(action: {
+                    Button(action: {buttonTaped(number: "0")
                         
                     }, label: {Image("zeroButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {buttonTaped(number: ".")
                         
                     }, label: {Image("pointButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {back()
                         
                     }, label: {Image("deleteButton").resizable().scaledToFit()})
                     
@@ -186,8 +210,64 @@ struct Calculator_view: View {
             }.onAppear{UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation"); AppDelegate.orientationLock = .portrait}.padding()
     }
        
+    func clear(){
+        self.clearAll = !self.clearAll
+        if self.clearAll && self.value == "0"{
+            self.value = "0"
+            self.upValue = "0"
+        }
+        else{
+            self.clearAll = !self.clearAll
+            self.value = "0"
+        }
         
+    }
     
+    func back(){
+        self.value.removeLast()
+        
+        if self.value.isEmpty || self.value == "0"{
+            self.value = "0"
+        }
+    }
+    
+    func transferValue(opp: String){
+        self.upValue = "\(self.value) \(opp)"
+        self.value = "0"
+    }
+    
+    func opperation(opp: String){
+        
+        
+        
+        switch opp{
+        case "+":
+            transferValue(opp: opp)
+            break
+        case "−":
+            transferValue(opp: opp)
+            break
+        case "×":
+            break
+        case "÷":
+            break
+        default:
+            break
+            
+            
+        }
+    }
+    func buttonTaped(number: String){
+        if self.value == "0" && number == "." {
+            self.value = "\(self.value)\(number)"
+        }
+        else if self.value == "0" {
+            value = number
+        }
+        else{
+            self.value = "\(self.value)\(number)"
+        }
+    }
     
     struct Calculator_view_Previews: PreviewProvider {
         
