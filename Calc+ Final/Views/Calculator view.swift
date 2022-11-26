@@ -10,25 +10,16 @@ import SwiftUI
 struct Calculator_view: View {
     
     @StateObject var detector: MotionDetector
-    @State var clearAll = false
     @State var upValue = "0"
     @State var value = "0"
+    @State var currOpp = ""
+    @State var num1 = 0
+    @State var num2 = 0
     
     var body: some View {
     
             VStack{
-    // Header
-                //ZStack{
-//                    Image("header")
-//                        .resizable()
-//                        .edgesIgnoringSafeArea(.all)
-//                        .frame(width: .infinity, height: 100)
-//                        .scaledToFill()
-//                        .position()
-                        
-                    
-                    
-                    //VStack{
+
                         ZStack{
 
                             HStack{
@@ -45,35 +36,20 @@ struct Calculator_view: View {
                             
                         }
                 
-                        
-                    //}
-                    
-                    
-                //}
-    // Screen
                 VStack{
-                    Spacer()
                     
-                    HStack{
-                        Spacer()
-                        Text(self.upValue)
-                            
+                    Color(.white)
+                        .frame(width: .infinity, height: 250)
+                        .overlay(Text(self.upValue)
                             .font(.system(size: 35))
-                            .padding()
-                    }
-                    
-                    Spacer()
-                    
-                    HStack{
-                        Spacer()
-                        Text(self.value)
+                            , alignment: .topTrailing)
+                        .overlay(Text(self.value)
                             .bold()
                             .font(.system(size: 70))
-                            .padding()
-                    }
+                            , alignment: .bottomTrailing)
                 }
                 
-    // Buttons
+                
                 HStack{
                     
                     Button(action: {
@@ -110,8 +86,7 @@ struct Calculator_view: View {
                         
                     }, label: {Image("percentButton").resizable().scaledToFit()})
                     
-                    Button(action: {buttonTaped(number: "÷")
-                        
+                    Button(action: {transferValue(opp: "÷")
                     }, label: {Image("divideButton").resizable().scaledToFit()})
                     
                     Button(action: {
@@ -132,7 +107,7 @@ struct Calculator_view: View {
                         
                     }, label: {Image("nineButton").resizable().scaledToFit()})
                     
-                    Button(action: {buttonTaped(number: "×")
+                    Button(action: {transferValue(opp: "×")
                         
                     }, label: {Image("multiplyButton").resizable().scaledToFit()})
                     
@@ -154,7 +129,7 @@ struct Calculator_view: View {
                         
                     }, label: {Image("sixButton").resizable().scaledToFit()})
                     
-                    Button(action: {buttonTaped(number: "−")
+                    Button(action: {transferValue(opp: "−")
                         
                     }, label: {Image("minusButton").resizable().scaledToFit()})
                     
@@ -176,7 +151,7 @@ struct Calculator_view: View {
                         
                     }, label: {Image("threeButton").resizable().scaledToFit()})
                     
-                    Button(action: {opperation(opp: "+")
+                    Button(action: {transferValue(opp: "+")
                         
                     }, label: {Image("plusButton").resizable().scaledToFit()})
                     
@@ -198,7 +173,7 @@ struct Calculator_view: View {
                         
                     }, label: {Image("deleteButton").resizable().scaledToFit()})
                     
-                    Button(action: {
+                    Button(action: {equal()
                         
                     }, label: {Image("equalButton").resizable().scaledToFit()})
                     
@@ -211,61 +186,81 @@ struct Calculator_view: View {
     }
        
     func clear(){
-        self.clearAll = !self.clearAll
-        if self.clearAll && self.value == "0"{
+        
+        if self.value == "0"{
             self.value = "0"
             self.upValue = "0"
         }
         else{
-            self.clearAll = !self.clearAll
             self.value = "0"
         }
         
     }
     
     func back(){
-        self.value.removeLast()
+        if  self.value != "0"{
+            self.value.removeLast()
+            self.upValue.removeLast()
+        }
+        else{
+            self.value.removeLast()
+        }
+        
+        // Access null violation fail safe
         
         if self.value.isEmpty || self.value == "0"{
             self.value = "0"
         }
+        
     }
     
     func transferValue(opp: String){
-        self.upValue = "\(self.value) \(opp)"
+        self.upValue = "\(self.value)\(opp)"
+        self.num1 = Int(self.value) ?? 0
+        self.currOpp = opp
         self.value = "0"
     }
     
-    func opperation(opp: String){
+    func equal(){
+        self.num2 = Int(self.value) ?? 0
         
-        
-        
-        switch opp{
+        switch self.currOpp{
         case "+":
-            transferValue(opp: opp)
+            self.num1 = self.num1 + self.num2
+            self.upValue = String(self.num1)
             break
         case "−":
-            transferValue(opp: opp)
+            self.num1 = self.num1 - self.num2
+            self.upValue = String(self.num1)
             break
         case "×":
+            self.num1 = self.num1 * self.num2
+            self.upValue = String(self.num1)
             break
         case "÷":
+            self.num1 = self.num1 / self.num2
+            self.upValue = String(self.num1)
             break
         default:
             break
-            
-            
+
         }
     }
     func buttonTaped(number: String){
-        if self.value == "0" && number == "." {
-            self.value = "\(self.value)\(number)"
-        }
-        else if self.value == "0" {
-            value = number
-        }
-        else{
-            self.value = "\(self.value)\(number)"
+        if self.value.count < 8 {
+            if self.value == "0" && number == "." {
+                self.value = "\(self.value)\(number)"
+            }
+            else if self.value == "0" {
+                value = number
+            }
+            else{
+                self.value = "\(self.value)\(number)"
+            }
+            
+            if self.upValue != "0"{
+                self.upValue = "\(self.upValue)\(number)"
+            }
         }
     }
     
