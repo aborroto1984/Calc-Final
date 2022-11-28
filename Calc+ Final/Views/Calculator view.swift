@@ -13,8 +13,6 @@ struct Calculator_view: View {
     @State var upValue = "0"
     @State var value = "0"
     @State var currOpp = ""
-    @State var num1 = 0
-    @State var num2 = 0
     @State var numLock = false
     
     let calc = Calculator()
@@ -190,7 +188,7 @@ struct Calculator_view: View {
     }
     
     func clear(){
-        self.numLock = false
+        //self.numLock = false
         if self.value == "0"{
             self.upValue = "0"
         }
@@ -203,7 +201,7 @@ struct Calculator_view: View {
     func back(){
         if  self.value != "0"{
             self.value.removeLast()
-            self.upValue.removeLast()
+            
         }
         else{
             self.value.removeLast()
@@ -219,7 +217,7 @@ struct Calculator_view: View {
     
     func transferValue(opp: String){
         
-        self.numLock = false
+        //self.numLock = false
         // Safe guards against multiple opperators
         if self.upValue.contains("+") || self.upValue.contains("−") || self.upValue.contains("×") || self.upValue.contains("÷") {equal()}
         
@@ -242,23 +240,23 @@ struct Calculator_view: View {
         
     }
     
-    func checkIfIsInt(num:Float)->(Int){
-        if num == floor(num){return Int(num)}
-        else {return 0}
+    func checkIfIsInt(num:Float)->Bool{
+        if num == floor(num){return true}
+        else {return false}
     }
     func displayNum(){
-        if checkIfIsInt(num: calc.result) == 0{
-            self.upValue = String(calc.result)
+        if checkIfIsInt(num: calc.result){
+            self.upValue = String(Int(calc.result))
         }
         else{
-            self.upValue = String(Int(calc.result))
+            self.upValue = String(calc.result)
         }
     }
         
     func equal(){
         
         if self.value == "Error" {self.value = "0"}
-        else if self.value == "0" && self.upValue != "0"{return}
+        //else if self.value == "0" && self.upValue != "0"{return}
         calc.num2 = Float(self.value) ?? 0
         self.value = "0"
         
@@ -268,16 +266,19 @@ struct Calculator_view: View {
             calc.add()
             displayNum()
             calc.clear()
+            self.currOpp = ""
             break
         case "−":
             calc.substract()
             displayNum()
             calc.clear()
+            self.currOpp = ""
             break
         case "×":
             calc.multiply()
             displayNum()
             calc.clear()
+            self.currOpp = ""
             break
         case "÷":
             if calc.num2 == 0{
@@ -288,34 +289,35 @@ struct Calculator_view: View {
             calc.divide()
             displayNum()
             calc.clear()
+            self.currOpp = ""
             break
         default:
             break
         }
-        self.numLock = true
     }
     func buttonTaped(number: String){
-        if !numLock{
             if self.value.count < 8 {
                 // Safe guards against decimal point duplicates
                 if self.value.contains(".") && number == "." {return}
+                else if self.currOpp.isEmpty && self.upValue != "0"{
+                    self.upValue = "0"
+                }
                 
                 if self.value == "0" && number == "." {
                     self.value = "\(self.value)\(number)"
                 }
                 else if self.value == "0" || self.value == "Error"{
-                    value = number
+                    self.value = number
                 }
                 else{
                     self.value = "\(self.value)\(number)"
                 }
                 
-                if self.upValue != "0"{
+                if self.upValue != "0" {
                     self.upValue = "\(self.upValue)\(number)"
                 }
             }
         }
-    }
     
     struct Calculator_view_Previews: PreviewProvider {
         
