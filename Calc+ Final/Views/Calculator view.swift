@@ -37,11 +37,14 @@ struct Calculator_view: View {
     @State var upValue = "0"
     @State var value = "0"
     @State var currOpp = ""
-    @State var typingNumerator = false
-    @State var typingDenominator = false
+    
     let calc = Calculator()
     let opps = ["+","−","×","÷"]
     
+    // Variables for fractions
+    @State var typingNumerator = false
+    @State var typingDenominator = false
+    @State var typingaFractionState = 0
     
     var body: some View {
         
@@ -204,12 +207,32 @@ struct Calculator_view: View {
                     
                 }, label: {Image("equalButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {buttonTaped(number: "⁄")
+                Button(action: {typingAFraction()
                     
                 }, label: {Image("emptyFractionButton").resizable().scaledToFit()})
                 
             }
         }.onAppear{UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation"); AppDelegate.orientationLock = .portrait}.padding()
+    }
+    func typingAFraction(){
+        if self.typingaFractionState == 0{
+            self.typingNumerator = true
+            self.typingaFractionState += 1
+        }
+        else if self.typingaFractionState == 1{
+            if currOpp.isEmpty{
+                
+            }
+            buttonTaped(number: "⁄")
+            self.typingNumerator = false
+            self.typingDenominator = true
+            self.typingaFractionState += 1
+        }
+        else{
+            self.typingNumerator = false
+            self.typingDenominator = false
+            self.typingaFractionState = 0
+        }
     }
     
     func numberFormater(number: String)-> String{
@@ -271,6 +294,10 @@ struct Calculator_view: View {
     
     func clear(){
         //self.numLock = false
+        self.typingNumerator = false
+        self.typingDenominator = false
+        self.typingaFractionState = 0
+
         if self.value == "0"{
             self.upValue = "0"
         }
@@ -281,18 +308,26 @@ struct Calculator_view: View {
     }
     
     func back(){
-        if  self.value != "0"{
+        if (!self.upValue.contains("+")  || !self.upValue.contains("−")  || !self.upValue.contains("×")  || !self.upValue.contains("÷")) &&
+            self.value == "0"
+        {
+            self.currOpp = ""
             self.value.removeLast()
-            
+            self.upValue.removeLast()
         }
         else{
+            
             self.value.removeLast()
+            self.upValue.removeLast()
         }
         
         // Access null violation fail safe
         
         if self.value.isEmpty || self.value == "0"{
             self.value = "0"
+        }
+        if self.upValue.isEmpty || self.upValue ==  "0" {
+            self.upValue = "0"
         }
 
     }
@@ -400,12 +435,42 @@ struct Calculator_view: View {
                     self.upValue = "\(self.upValue)\(number)"
                 }
                 
-                // Typing a fraction
-                if self.value == "⁄"{
-                    self.typingNumerator = true
-                }
             }
         }
+    
+    func translateNumerator(num: String) -> Int{
+        var number = ""
+        
+        num.forEach { char in
+            
+            switch String(char){
+            case numerator.upZero.rawValue:
+                
+                break
+            case numerator.upOne.rawValue:
+                break
+            case numerator.upTwo.rawValue:
+                break
+            case numerator.upThree.rawValue:
+                break
+            case numerator.upFour.rawValue:
+                break
+            case numerator.upFive.rawValue:
+                break
+            case numerator.upSix.rawValue:
+                break
+            case numerator.upSeven.rawValue:
+                break
+            case numerator.upEight.rawValue:
+                break
+            case numerator.upNine.rawValue:
+                break
+            default:
+                break
+            }
+        }
+            return Int(number) ?? 0
+    }
     
     struct Calculator_view_Previews: PreviewProvider {
         
@@ -419,8 +484,18 @@ struct Calculator_view: View {
 
 class Calculator{
     var num1:Float = 0
+    var fraction1numerator:Int = 0
+    var fraction1denominator:Int = 0
+    
     var num2:Float = 0
+    var fraction2numerator:Int = 0
+    var fraction2denominator:Int = 0
+    
     var result:Float = 0
+    
+    func getDenominator(num:String){
+        
+    }
     
     func clear(){
         self.num1 = 0
@@ -430,32 +505,16 @@ class Calculator{
         self.result = self.num1 + self.num2
     }
     
-    func addToResult(){
-        self.result += self.num1
-    }
-    
     func multiply(){
         self.result = self.num1 * self.num2
-    }
-    
-    func multiplyToResult(){
-        self.result *= self.num1
     }
     
     func substract(){
         self.result = self.num1 - self.num2
     }
-    
-    func SubstractToResult(){
-        self.result -= self.num1
-    }
-    
+
     func divide(){
         self.result = self.num1 / self.num2
-    }
-    
-    func divideToResult(){
-        self.result /= self.num1
     }
 
 }
