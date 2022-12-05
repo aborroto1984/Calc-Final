@@ -179,7 +179,6 @@ struct Calculator_view: View {
             
             
             
-            
             HStack{
                 
                 Button(action: {
@@ -314,48 +313,102 @@ struct Calculator_view: View {
             }
         }.onAppear{UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation"); AppDelegate.orientationLock = .portrait}.padding()
     }
+    
+    func copyNumToNum1(){
+        self.upNum1 = self.num
+        if numHasFraction{
+            self.upFractionNumerator1 = self.numerator
+            self.upFraction1Slash     = self.fractionSlash
+            self.upFractionDenominator1 = self.denominator
+        }
+        if numHasUnit{
+            self.upUnit1 = self.unit
+        }
+    }
+    func copyNumToNum2(){
+        self.upNum2 = self.num
+        if numHasFraction{
+            self.upFractionNumerator2 = self.numerator
+            self.upFraction2Slash     = self.fractionSlash
+            self.upFractionDenominator2 = self.denominator
+        }
+        if numHasUnit{
+            self.upUnit2 = self.unit
+        }
+    }
+    
     func typingAFraction(){
-//
+
         if self.typingaFractionState == 0{
             self.typingNumerator = true
             self.numHasFraction = true
+            
+            // Initial numerator state
+            if self.numerator == ""{
+                self.numerator = "0"
+                self.fractionSlash = "_"
+                //copyNumToNum1()
+                
+            }
+                
+            
             if self.currOp.isEmpty{
                 self.num1HasFraction = true
             }else{
                 self.num2HasFraction = true
             }
-            self.typingaFractionState += 1
+            self.typingaFractionState = 1
+            
+            // Leaving just fraction if num = 0
+            if self.num == "0"{
+                self.num = ""
+                self.numerator = "0"
+                self.fractionSlash = "_"
+                
+                if self.num2HasFraction{
+                    copyNumToNum2()}
+                else {copyNumToNum1()}
+                    
+            }
         }
         else if self.typingaFractionState == 1{
+            // Initial denominator state
+            self.denominator = "1"
             self.typingNumerator = false
             self.typingDenominator = true
-            self.typingaFractionState += 1
+            self.typingaFractionState = 2
+            if self.num2HasFraction{
+                copyNumToNum2()
+            }else{
+                copyNumToNum1()
+            }
         }
-        else{
+        else if self.typingaFractionState == 2{
             self.typingNumerator = false
             self.typingDenominator = false
             self.typingaFractionState = 0
+            
             // Filling empty with zero
-            if self.num1HasFraction{
-                if self.upFractionNumerator1.isEmpty{
-                    self.upFractionNumerator1 = "0"
-                    self.numerator = "0"
-                }
-                else if self.upFractionDenominator1.isEmpty{
-                    self.upFractionDenominator1 = "0"
-                    self.denominator = "0"
-                }
-            }
-            else if self.num2HasFraction{
-                if self.upFractionNumerator2.isEmpty{
-                    self.upFractionNumerator2 = "0"
-                    self.numerator = "0"
-                }
-                else if self.upFractionDenominator2.isEmpty{
-                    self.upFractionDenominator2 = "0"
-                    self.denominator = "0"
-                }
-            }
+//            if self.num1HasFraction{
+//                if self.upFractionNumerator1.isEmpty{
+//                    self.upFractionNumerator1 = "0"
+//                    self.numerator = "0"
+//                }
+//                else if self.upFractionDenominator1.isEmpty{
+//                    self.upFractionDenominator1 = "0"
+//                    self.denominator = "0"
+//                }
+//            }
+//            else if self.num2HasFraction{
+//                if self.upFractionNumerator2.isEmpty{
+//                    self.upFractionNumerator2 = "0"
+//                    self.numerator = "0"
+//                }
+//                else if self.upFractionDenominator2.isEmpty{
+//                    self.upFractionDenominator2 = "0"
+//                    self.denominator = "0"
+//                }
+//            }
         }
     }
     
@@ -391,57 +444,100 @@ struct Calculator_view: View {
     func clear(){
         // Clearing fraction members
         if self.typingNumerator{
-            if self.num1HasFraction{
-                self.upFractionNumerator1 = ""
-                self.upFraction1Slash = ""
+            
+            if self.numerator == "0"{
+                self.typingNumerator = false
+                self.numHasFraction = false
+                
+                if self.num2HasFraction{
+                    self.num2HasFraction = false
+                }
+                else{
+                    self.num1HasFraction = false}
+                
+                self.typingaFractionState = 0
+                if self.num == ""{ self.num = "0"}
             }
-            else if self.num2HasFraction{
-                self.upFractionNumerator2 = ""
-                self.upFraction2Slash = ""
+            
+            self.numerator = "0"
+            self.fractionSlash = "_"
+            
+            if self.num2HasFraction{
+                copyNumToNum2()
             }
-            self.numerator = ""
-            self.fractionSlash = ""
+            else{
+                copyNumToNum1()}
         }
-        else if self.typingDenominator{
-            if self.num1HasFraction{
-                self.upFractionDenominator1 = ""
-                // Dynamicaly returning fraction slash to optimal size
-                self.fractionSlash = ""
-                self.upFraction1Slash = ""
-                for _ in 1...self.numerator.count{
-                    self.fractionSlash = "\(self.fractionSlash)" + "_"
-                    self.upFraction1Slash = "\(self.upFraction1Slash)" + "_"}
-            }
-            else if self.num2HasFraction{
-                self.upFractionDenominator2 = ""
-                // Dynamicaly returning fraction slash to optimal size
-                self.fractionSlash = ""
-                self.upFraction1Slash = ""
-                for _ in 1...self.numerator.count{
-                    self.fractionSlash = "\(self.fractionSlash)" + "_"
-                    self.upFraction2Slash = "\(self.upFraction2Slash)" + "_"}
-            }
-            self.denominator = ""
-        }
-    
         
-        else if self.currOp.isEmpty == false{
+        else if self.typingDenominator{
+            
+            if self.denominator == "1"{
+                self.typingDenominator = false
+                self.typingNumerator = true
+                self.denominator = ""
+                self.typingaFractionState = 1
+            }else{
+                self.denominator = "1"
+                self.fractionSlash = ""
+                for _ in 1...self.numerator.count{
+                    self.fractionSlash = "\(self.fractionSlash)" + "_"}}
+            
+            if self.num2HasFraction{
+                copyNumToNum2()}
+            else{copyNumToNum1()}
+        }
+        
+        else if self.currOp == ""{
             // Clearing num and num2
             clearNum()
+            clearNum1()
+        }
+        else if self.num2HasFraction{
+            clearNum()
             clearNum2()
+        }
+        else if self.upNum2 == ""{
             self.currOp = ""
         }
-        
         else {
             // Clearing num and num1
             clearNum()
-            clearNum1()
+            clearNum2()
             
         }
     }
     
     func back(){
-        if self.num2HasFraction {
+        // Deleting numbers while writing a fraction
+        if typingNumerator{
+            self.numerator.removeLast()
+            self.fractionSlash.removeLast()
+            
+            if self.numerator.isEmpty{
+                self.numerator = "0"
+                self.fractionSlash = "_"
+            }
+            
+            if self.num2HasFraction{
+                copyNumToNum2()
+            }else{
+                copyNumToNum1()}
+        }
+        else if typingDenominator{
+            self.denominator.removeLast()
+            if self.denominator.count >= numerator.count{
+                self.fractionSlash.removeLast()
+            }
+            if self.denominator.isEmpty{
+                self.denominator = "1"
+            }
+            
+            if self.num2HasFraction{
+                copyNumToNum2()
+            }else{
+                copyNumToNum1()}
+        }
+        else if self.num2HasFraction {
             // Deleting num2 fraction
             self.upFractionNumerator2 = ""
             self.upFractionDenominator2 = ""
@@ -468,7 +564,6 @@ struct Calculator_view: View {
             self.num = self.upNum1
         }
         else if self.num1HasFraction{
-            //self.currOp = ""
             // Deleting num1 fraction
             self.upFractionNumerator1 = ""
             self.upFractionDenominator1 = ""
@@ -491,7 +586,16 @@ struct Calculator_view: View {
             if self.num.isEmpty && !self.numHasFraction{self.num = "0"}
             if self.upNum1.isEmpty && !self.num1HasFraction{self.upNum1 = "0"}
         }
-
+//        if self.numerator.isEmpty{
+//            self.numerator = "0"
+//        }else if self.denominator.isEmpty{
+//            self.denominator = "0"
+//        }
+//
+//        if self.num2HasFraction{
+//            copyNumToNum2()
+//        }else{
+//            copyNumToNum1()}
     }
     
     func transferValue(op: String){
@@ -512,6 +616,7 @@ struct Calculator_view: View {
 
     }
     
+    // Equal helper functions
     func checkIfIsInt(num:Float)->Bool{
         if num == floor(num){return true}
         else {return false}
@@ -524,155 +629,229 @@ struct Calculator_view: View {
             self.upNum1 = String(calc.result)
         }
     }
+    func displayFraction(){
+        self.upFractionNumerator1 = String(calc.resultNumerator)
+        self.upFractionDenominator1 = String(calc.resultDenominator)
+        
+        if self.upFractionNumerator1 == "0"{
+            self.num1HasFraction = false
+        }else {
+            self.num1HasFraction = true
+            var size = 0
+            if self.upFractionNumerator1.count >= self.upFractionDenominator1.count {
+                size = self.upFractionNumerator1.count
+            }else {
+                size = self.upFractionDenominator1.count
+            }
+            for _ in 1...size{
+                self.upFraction1Slash = "\(self.upFraction1Slash)" + "_"}
+            
+        }
+    }
         
     func equal(){
         
         if self.num == "Error" {self.num = "0"}
         //else if self.value == "0" && self.upValue != "0"{return}
 
-        if self.num1HasFraction{
+        if self.num2HasFraction{
             calc.fraction2numerator = Int(self.upFractionNumerator2) ?? 0
             calc.fraction2denominator = Int(self.upFractionDenominator2) ?? 0
         }
+        if self.upNum2 == "" {self.upNum2 = "0"}
         calc.num2 = Float(self.upNum2) ?? 0
         
-        clearNum()
-        clearNum2()
         
         switch self.currOp{
         case "+":
             calc.add()
             displayNum()
+            displayFraction()
             calc.clear()
             self.currOp = ""
             break
         case "−":
             calc.substract()
             displayNum()
+            displayFraction()
             calc.clear()
             self.currOp = ""
             break
         case "×":
             calc.multiply()
             displayNum()
+            displayFraction()
             calc.clear()
             self.currOp = ""
             break
         case "÷":
-            if calc.num2 == 0{
-                self.value = "Error"
+            if self.upNum2 == "0"{
+                self.num = "Error"
                 self.upNum1 = "0"
-                break
-            }
-            calc.divide()
-            displayNum()
-            calc.clear()
-            self.currOp = ""
+                self.currOp = ""
+                
+            }else{
+                calc.divide()
+                displayNum()
+                displayFraction()
+                calc.clear()
+                self.currOp = ""}
             break
         default:
             break
         }
+        
+        clearNum()
+        clearNum2()
     }
     func buttonTaped(number: String){
-        // If num contains decimal fractions are not allowed
-        if number == "."{
-            self.numIsDecimal = true
-        }
-        // Typing num1 fraction
-        if self.numHasFraction && self.currOp.isEmpty{
-            // If the number is a decimal no fractions are allowed
-            if self.num.contains(".") {
-                self.numHasFraction = false
-                self.num1HasFraction = false
-                return}
-            
-            else if self.typingNumerator && number != "."{
-                // Getting rid of the zero if it is just fraction
-                if self.num == "0"{
-                    self.num = ""
-                    self.upNum1 = ""
-                }
-                self.numerator = "\(self.numerator)\(number)"
-                self.upFractionNumerator1 = "\(self.upFractionNumerator1)\(number)"
-                self.fractionSlash = "\(self.fractionSlash)" + "_"
-                self.upFraction1Slash = "\(self.upFraction1Slash)" + "_"
+        // Marking current number a decimal
+        if self.num.contains("."){self.numIsDecimal = true}else{self.numIsDecimal = false}
+        
+        if typingNumerator && !self.numIsDecimal{
+            // Removing the zero
+            if self.numerator == "0" {
+                self.numerator = ""
+                self.fractionSlash = ""
             }
-            else if self.typingDenominator && number != "."{
-                self.denominator = "\(self.denominator)\(number)"
-                self.upFractionDenominator1 = "\(self.upFractionDenominator1)\(number)"
-                if self.denominator.count > self.numerator.count{
-                    self.fractionSlash = "\(self.fractionSlash)" + "_"
-                    self.upFraction1Slash = "\(self.upFraction1Slash)" + "_"
-                }
-            
-            }
-        }
-        // Typing num2 fraction
-        else if self.num2HasFraction{
-            // If the number is a decimal no fractions are allowed
-            if self.num.contains(".") {
-                self.numHasFraction = false
-                self.num2HasFraction = false
-                return}
-            
-            else if self.typingNumerator && number != "."{
-                // Getting rid of the zero if it is just fraction
-                if self.num == "0"{
-                    self.num = ""
-                    self.upNum2 = ""
-                }
-                self.numerator = "\(self.numerator)\(number)"
-                self.upFractionNumerator2 = "\(self.upFractionNumerator2)\(number)"
-                self.fractionSlash = "\(self.fractionSlash)" + "_"
-                self.upFraction2Slash = "\(self.upFraction2Slash)" + "_"
-            }
-            else if self.typingDenominator && number != "."{
-                self.denominator = "\(self.denominator)\(number)"
-                self.upFractionDenominator2 = "\(self.upFractionDenominator2)\(number)"
-                if self.denominator.count > self.numerator.count{
-                    self.fractionSlash = "\(self.fractionSlash)" + "_"
-                    self.upFraction2Slash = "\(self.upFraction2Slash)" + "_"
-                }
-            }
-        }
-        // Typing regular numbers
-        else if self.currOp.isEmpty{
-            // Adds zero if decimal point is taped
-            if number == "." && self.num == "0"{
-                self.num = "0."
-                self.upNum1 = "0."
-            }
-            // Safe guards against decimal point duplicates
-            if self.num.contains(".") && number == "." {return}
-            
-            if self.num == "0" || self.num == "Error"{
-                self.num = number
-                self.upNum1 = number
-            }
-            else{
-                self.num = "\(self.num)\(number)"
-                self.upNum1 = "\(self.upNum1)\(number)"
-            }
+            // Typing numerator
+            self.numerator = "\(self.numerator)\(number)"
+            self.fractionSlash = "\(self.fractionSlash)" + "_"
         }
         
-        else if self.currOp.isEmpty == false{
-            // Adds zero if decimal point is taped
-            if number == "." && self.num == "0"{
-                self.num = "0."
-                self.upNum2 = "0."
+        else if self.typingDenominator && !self.numIsDecimal{
+            // Removing one
+            if self.denominator == "1"{self.denominator = ""}
+            // Typing denominator
+            self.denominator = "\(self.denominator)\(number)"
+            if self.denominator.count > numerator.count {
+                self.fractionSlash = "\(self.fractionSlash)" + "_"
             }
-            // Safe guards against decimal point duplicates
-            if self.num.contains(".") && number == "." {return}
             
-            if self.num == "0" || self.num == "Error"{
-                self.num = number
-                self.upNum2 = number
-            }
-            else{
-                self.num = "\(self.num)\(number)"
-                self.upNum2 = "\(self.upNum2)\(number)"
-            }
         }
+        
+        else if number == "." && self.num == "0"{
+            self.num = "\(self.num)\(number)"
+        }
+        else if self.num == "0"{
+            self.num = ""
+            self.num = "\(self.num)\(number)"
+        }
+        else{
+            self.num = "\(self.num)\(number)"
+        }
+        
+        // Copying the num to the top views
+        if self.currOp.isEmpty{
+            copyNumToNum1()
+        }else{
+            copyNumToNum2()
+        }
+//
+        
+        
+        // Not typing a fraction
+        
+//        // If num contains decimal fractions are not allowed
+//        if number == "."{
+//            self.numIsDecimal = true
+//        }
+//        // Typing num1 fraction
+//        if self.numHasFraction && self.currOp.isEmpty{
+//            // If the number is a decimal no fractions are allowed
+//            if self.num.contains(".") {
+//                self.numHasFraction = false
+//                self.num1HasFraction = false
+//                return}
+//
+//            else if numerator == "0"{
+//                self.numerator = ""
+//                self.numerator = "\(self.numerator)\(number)"
+//
+//                copyNumToNum1()
+//            }
+//            else if self.typingNumerator && number != "."{
+//                self.numerator = "\(self.numerator)\(number)"
+//                self.upFractionNumerator1 = "\(self.upFractionNumerator1)\(number)"
+//                self.fractionSlash = "\(self.fractionSlash)" + "_"
+//                self.upFraction1Slash = "\(self.upFraction1Slash)" + "_"
+//            }
+//            else if self.typingDenominator && number != "."{
+//                self.denominator = "\(self.denominator)\(number)"
+//                self.upFractionDenominator1 = "\(self.upFractionDenominator1)\(number)"
+//                if self.denominator.count > self.numerator.count{
+//                    self.fractionSlash = "\(self.fractionSlash)" + "_"
+//                    self.upFraction1Slash = "\(self.upFraction1Slash)" + "_"
+//                }
+//
+//            }
+//        }
+//        // Typing num2 fraction
+//        else if self.num2HasFraction{
+//            // If the number is a decimal no fractions are allowed
+//            if self.num.contains(".") {
+//                self.numHasFraction = false
+//                self.num2HasFraction = false
+//                return}
+//            else if numerator == "0"{
+//                self.numerator = ""
+//                self.numerator = "\(self.numerator)\(number)"
+//
+//                copyNumToNum2()
+//            }
+//            else if self.typingNumerator && number != "."{
+//                self.numerator = "\(self.numerator)\(number)"
+//                self.upFractionNumerator2 = "\(self.upFractionNumerator2)\(number)"
+//                self.fractionSlash = "\(self.fractionSlash)" + "_"
+//                self.upFraction2Slash = "\(self.upFraction2Slash)" + "_"
+//            }
+//            else if self.typingDenominator && number != "."{
+//                self.denominator = "\(self.denominator)\(number)"
+//                self.upFractionDenominator2 = "\(self.upFractionDenominator2)\(number)"
+//                if self.denominator.count > self.numerator.count{
+//                    self.fractionSlash = "\(self.fractionSlash)" + "_"
+//                    self.upFraction2Slash = "\(self.upFraction2Slash)" + "_"
+//                }
+//            }
+//        }
+//        // Typing regular numbers
+//        else if self.currOp.isEmpty{
+//            // Adds zero if decimal point is taped
+//            if number == "." && self.num == "0"{
+//                self.num = "0."
+//                self.upNum1 = "0."
+//            }
+//            // Safe guards against decimal point duplicates
+//            if self.num.contains(".") && number == "." {return}
+//
+//            if self.num == "0" || self.num == "Error"{
+//                self.num = number
+//                self.upNum1 = number
+//            }
+//            else{
+//                self.num = "\(self.num)\(number)"
+//                self.upNum1 = "\(self.upNum1)\(number)"
+//            }
+//        }
+//
+//        else if self.currOp.isEmpty == false{
+//            // Adds zero if decimal point is taped
+//            if number == "." && self.num == "0"{
+//                self.num = "0."
+//                self.upNum2 = "0."
+//            }
+//            // Safe guards against decimal point duplicates
+//            if self.num.contains(".") && number == "." {return}
+//
+//            if self.num == "0" || self.num == "Error"{
+//                self.num = number
+//                self.upNum2 = number
+//            }
+//            else{
+//                self.num = "\(self.num)\(number)"
+//                self.upNum2 = "\(self.upNum2)\(number)"
+//            }
+//        }
     }
     
     struct Calculator_view_Previews: PreviewProvider {
@@ -695,26 +874,172 @@ class Calculator{
     var fraction2denominator:Int = 0
     
     var result:Float = 0
+    var resultNumerator: Int = 0
+    var resultDenominator: Int = 0
     
+    var gcd = 0
+    
+    // Greater common denomintor
+    func gcd(num1: Int, num2: Int) -> Int {
+        if num2 == 0{return num1}
+        else {return gcd(num1:num2, num2:num1 % num2)}
+    }
+    
+    // Simplifying result
+    func fractionSimplifier(){
+        gcd = gcd(num1: resultNumerator, num2: resultDenominator)
+        if gcd != 0{
+            resultNumerator = resultNumerator / gcd
+            resultDenominator = resultDenominator / gcd}
+        
+        if resultNumerator > resultDenominator{
+            result += Float(resultNumerator / resultDenominator)
+            resultNumerator = resultNumerator % resultDenominator
+        }
+    }
+    
+    func correctingResult(){
+        if resultDenominator == 1{
+            result = result + Float(resultNumerator)
+            resultNumerator = 0
+            resultDenominator = 0
+        }
+    }
     
     func clear(){
         self.num1 = 0
         self.num2 = 0
+        self.fraction1numerator = 0
+        self.fraction1denominator = 0
+        self.fraction2numerator = 0
+        self.fraction2denominator = 0
     }
     func add(){
         self.result = self.num1 + self.num2
+        // Adding fractions
+        if fraction2numerator == 0  && fraction2denominator == 0{
+            resultNumerator = fraction1numerator
+            resultDenominator = fraction1denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+            
+        }
+        else if fraction1numerator == 0  && fraction1denominator == 0{
+            resultNumerator = fraction2numerator
+            resultDenominator = fraction2denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+        }
+        else{
+            // Calculating numerator
+            resultNumerator = ((fraction1numerator * fraction2denominator) + (fraction2numerator * fraction1denominator))
+            // Calculating denominaor
+            resultDenominator = fraction1denominator * fraction2denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+        }
+        
     }
     
     func multiply(){
         self.result = self.num1 * self.num2
+        // Multiplying fractions
+        if fraction2numerator == 0  && fraction2denominator == 0{
+            resultNumerator = fraction1numerator
+            resultDenominator = fraction1denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+            
+        }
+        else if fraction1numerator == 0  && fraction1denominator == 0{
+            resultNumerator = fraction2numerator
+            resultDenominator = fraction2denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+        }
+        else{
+            // Multiplying
+            resultNumerator = fraction1numerator * fraction2numerator
+            resultDenominator = fraction1denominator * fraction2denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+        }
     }
     
     func substract(){
         self.result = self.num1 - self.num2
+        // Adding fractions
+        if fraction2numerator == 0  && fraction2denominator == 0{
+            resultNumerator = fraction1numerator
+            resultDenominator = fraction1denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+            
+        }
+        else if fraction1numerator == 0  && fraction1denominator == 0{
+            resultNumerator = fraction2numerator
+            resultDenominator = fraction2denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+        }
+        else{
+            // Calculating numerator
+            resultNumerator = ((fraction1numerator * fraction2denominator) - (fraction2numerator * fraction1denominator))
+            // Calculating denominaor
+            resultDenominator = fraction1denominator * fraction2denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+        }
     }
 
     func divide(){
-        self.result = self.num1 / self.num2
+        if self.num2 != 0{
+            self.result = self.num1 / self.num2}
+        // Dividing fractions
+        if fraction2numerator == 0  && fraction2denominator == 0{
+            resultNumerator = fraction1numerator
+            resultDenominator = fraction1denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+            
+        }
+        else if fraction1numerator == 0  && fraction1denominator == 0{
+            resultNumerator = fraction2numerator
+            resultDenominator = fraction2denominator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+        }
+        else{
+            // Multiplying
+            resultNumerator = fraction1numerator * fraction2denominator
+            resultDenominator = fraction1denominator * fraction2numerator
+            // Simplifying fraction
+            fractionSimplifier()
+            // Making sure fraction it is still a fraction
+            correctingResult()
+        }
     }
 
 }
