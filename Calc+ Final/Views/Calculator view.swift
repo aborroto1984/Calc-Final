@@ -255,9 +255,9 @@ struct Calculator_view: View {
                     
                 }, label: {Image("clearButton").resizable().scaledToFit()})
                 
-                Button(action: {plusMinus()
+                Button(action: {
                     
-                }, label: {Image("plusMinusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("clearAllButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
                 Button(action: {
                     
@@ -268,7 +268,7 @@ struct Calculator_view: View {
                 
                 Button(action: {
                     
-                }, label: {Image("xOver2Button").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("squareRootButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
             }
             
             HStack{
@@ -290,7 +290,7 @@ struct Calculator_view: View {
                 
                 Button(action: {
                     
-                }, label: {Image("xOver4Button").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("squareButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
             }
             
             HStack{
@@ -310,9 +310,9 @@ struct Calculator_view: View {
                     
                 }, label: {Image("minusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {
+                Button(action: {plusMinus()
                     
-                }, label: {Image("xOver8Button").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("plusMinusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
             }
             
             HStack{
@@ -332,9 +332,10 @@ struct Calculator_view: View {
                     
                 }, label: {Image("plusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {
+                Button(action: {if !numIsDecimal{typingAFraction()}
                     
-                }, label: {Image("xOver16Button").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("emptyFractionButton").resizable().scaledToFit()})
+                
             }
             
             HStack{
@@ -352,11 +353,9 @@ struct Calculator_view: View {
                 
                 Button(action: {equal()
                     
-                }, label: {Image("equalButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("equalBigButton").scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {if !numIsDecimal{typingAFraction()}
-                    
-                }, label: {Image("emptyFractionButton").resizable().scaledToFit()})
+                
                 
             }
         }.onAppear{UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation"); AppDelegate.orientationLock = .portrait}.padding()
