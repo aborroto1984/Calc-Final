@@ -92,6 +92,13 @@ struct Calculator_view: View {
     
     @State var numIsDecimal = false
     
+    @State var numIsNegative = false
+    @State var fractionIsNegative = false
+    @State var num1IsNegative = false
+    @State var num1FractionIsNegative = false
+    @State var num2IsNegative = false
+    @State var num2FractionIsNegative = false
+    
     var body: some View {
         
         VStack{
@@ -116,33 +123,72 @@ struct Calculator_view: View {
                     // Number 1
                     Text(self.upNum1)
                         .font(.system(size: 35))
+                        .lineLimit(1)
+                        
+                    
                     // Number 1 Fraction
                     if num1HasFraction{
-                        ZStack{
-                            Text(self.upFractionNumerator1).offset(y:-13)
-                            Text(self.upFraction1Slash).offset(y:-9)
-                            Text(self.upFractionDenominator1).offset(y:13)
-                            
-                        }
-                        .font(.system(size:20))}
+                        HStack{
+                            // Number 1 Fraction is negative
+                            if num1FractionIsNegative{ Text("-")}
+                            ZStack{
+                                Text(self.upFractionNumerator1).offset(y:-13)
+                                Text(self.upFraction1Slash).offset(y:-9)
+                                Text(self.upFractionDenominator1).offset(y:13)
+                            }
+                        }.font(.system(size:20))
+                            .lineLimit(1)
+                           
+                    }
                     // Number 1 unit
                     if num1HasUnit{Text(self.upUnit1)}
                     
                     // Operator
                     Text(self.currOp).font(.system(size:35))
+                        .lineLimit(1)
+                       
                     
                     // Number 2
-                    if self.upNum2 != ""{Text(self.upNum2)
-                        .font(.system(size: 35))}
+                    if self.upNum2 != ""{
+                        Group{
+                            // If number is negative
+                            if self.num2IsNegative{ Text("(") }
+                            
+                            Text(self.upNum2)
+                            
+                            
+                            // If number is negative
+                            if self.num2IsNegative && !self.num2HasFraction{ Text(")") }
+                            
+                        }.font(.system(size: 35))
+                            .lineLimit(1)
+                            
+                    }
+                    
                     // number 2 fraction
                     if num2HasFraction{
-                        ZStack{
-                            Text(self.upFractionNumerator2).offset(y:-13)
-                            Text(self.upFraction2Slash).offset(y:-9)
-                            Text(self.upFractionDenominator2).offset(y:13)
+                        HStack{
+                            // Number 2 Fraction is negative
+                            if num2FractionIsNegative{
+                                Group{
+                                    Text("(")
+                                    Text("-")}.font(.system(size: 35))
+                                
+                            }
+                            
+                            ZStack{
+                                Text(self.upFractionNumerator2).offset(y:-13)
+                                Text(self.upFraction2Slash).offset(y:-9)
+                                Text(self.upFractionDenominator2).offset(y:13)
+                            }.font(.system(size:20))
+                                .lineLimit(1)
+                            
+                            // Number 2 Fraction is negative
+                            if self.num2FractionIsNegative || self.num2IsNegative{ Text(")").font(.system(size: 35))}
                             
                         }
-                        .font(.system(size:20))}
+                            
+                    }
                     // Number 2 unit
                     if num2HasUnit{Text(self.upUnit2)}
                         
@@ -151,25 +197,26 @@ struct Calculator_view: View {
                 Spacer()
                 // Bottom number
                 HStack{
-                    Spacer()
+                    if self.num.count < 8 {Spacer()}
                     // Number
                     Text(self.num)
                         .bold()
                         .font(.system(size: 70))
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
                     // Number fraction
                     if numHasFraction {
-                        ZStack{
-                            Text(self.numerator).offset(y: -20)
-                            Text(self.fractionSlash).offset(y: -15)
-                            Text(self.denominator).offset(y: 20)
+                        HStack{
+                            // Number Fraction is negative
+                            if fractionIsNegative{ Text("-")}
                             
-                        }
-                        .bold()
-                        .font(.system(size: 35))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                            ZStack{
+                                Text(self.numerator).offset(y: -20)
+                                Text(self.fractionSlash).offset(y: -15)
+                                Text(self.denominator).offset(y: 20)
+                            }
+                        }.bold()
+                            .font(.system(size: 35))
+                            .lineLimit(1)
                     }
                     if numHasUnit{Text(self.unit)}
                 }
@@ -208,7 +255,7 @@ struct Calculator_view: View {
                     
                 }, label: {Image("clearButton").resizable().scaledToFit()})
                 
-                Button(action: {
+                Button(action: {plusMinus()
                     
                 }, label: {Image("plusMinusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
@@ -313,6 +360,51 @@ struct Calculator_view: View {
                 
             }
         }.onAppear{UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation"); AppDelegate.orientationLock = .portrait}.padding()
+    }
+    func plusMinus(){
+        // Typing firt number
+        if self.currOp == ""{
+            // Number has fraction but not whole number
+            if numHasFraction && num == ""{
+                // Turning negative signal off and on
+                self.fractionIsNegative = !self.fractionIsNegative
+                self.num1FractionIsNegative = !self.num1FractionIsNegative
+            }
+            // Number has no fraction or a fraction with number
+            else{
+                // Turning negative signal off and on
+                self.numIsNegative = !self.numIsNegative
+                
+                if self.numIsNegative{
+                    self.num = "-" + self.num
+                    self.upNum1 = "-" + self.upNum1
+                }else{
+                    self.num.removeFirst()
+                    self.upNum1.removeFirst()
+                }
+            }
+            // Typing second number
+        }else{
+            if numHasFraction && num == ""{
+                // Turning negative signal off and on
+                self.fractionIsNegative = !self.fractionIsNegative
+                self.num2FractionIsNegative = !self.num2FractionIsNegative
+            }
+            // Number has no fraction or a fraction with number
+            else{
+                // Turning negative signal off and on
+                self.numIsNegative = !self.numIsNegative
+                self.num2IsNegative = !self.num2IsNegative
+                
+                if self.numIsNegative{
+                    self.num = "-" + self.num
+                    self.upNum2 = "-" + self.upNum2
+                }else{
+                    self.num.removeFirst()
+                    self.upNum2.removeFirst()
+                }
+            }
+        }
     }
     
     func copyNumToNum1(){
@@ -425,7 +517,9 @@ struct Calculator_view: View {
             self.denominator = ""
             self.fractionSlash = ""
             self.numHasFraction = false
+            self.fractionIsNegative = false
         }
+        self.numIsNegative = false
         self.num = "0"
     }
     func clearNum1(){
@@ -434,7 +528,9 @@ struct Calculator_view: View {
             self.upFractionDenominator1 = ""
             self.upFraction1Slash = ""
             self.num1HasFraction = false
+            self.num1FractionIsNegative = false
         }
+        self.num1IsNegative = false
         self.upNum1 = "0"
     }
     func clearNum2(){
@@ -443,7 +539,9 @@ struct Calculator_view: View {
             self.upFractionDenominator2 = ""
             self.upFraction2Slash = ""
             self.num2HasFraction = false
+            self.num2FractionIsNegative = false
         }
+        self.num2IsNegative = false
         self.upNum2 = ""
     }
     
@@ -585,7 +683,10 @@ struct Calculator_view: View {
             self.upNum1.removeLast()
             self.num.removeLast()
         }
-        
+        if self.upNum1 == "-" || self.num == "-"{
+            self.upNum1 = "0"
+            self.num = "0"
+        }
         
         // Save guard if value is empty
         if self.upNum1.isEmpty || self.num.isEmpty{
@@ -604,6 +705,23 @@ struct Calculator_view: View {
 //            copyNumToNum1()}
     }
     
+    func decimalPointLocator(number:String)-> Float{
+        var pastDecimal = false
+        var result: Float = 1
+        
+        for letter in number{
+            
+            if pastDecimal{
+                result *= 10
+            }
+            
+            if letter == "."{
+                pastDecimal = true
+            }
+        }
+        return result
+    }
+    
     func transferValue(op: String){
         
         // Safe guards against multiple opperators
@@ -613,10 +731,22 @@ struct Calculator_view: View {
         else{
             self.currOp = op
 
+            // intuping the fraction
             if self.num1HasFraction{
-                calc.fraction1numerator = Int(self.upFractionNumerator1) ?? 0
-                calc.fraction1denominator = Int(self.upFractionDenominator1) ?? 0
+                if self.num1FractionIsNegative{
+                    calc.fraction1numerator = Int("-" + self.upFractionNumerator1) ?? 0
+                    calc.fraction1denominator = Int(self.upFractionDenominator1) ?? 0
+                }else{
+                    calc.fraction1numerator = Int(self.upFractionNumerator1) ?? 0
+                    calc.fraction1denominator = Int(self.upFractionDenominator1) ?? 0
+                }
             }
+            
+            // calculating decimal point location
+            if self.upNum1.contains("."){
+                calc.num1DecimalMultiplier = decimalPointLocator(number: self.upNum1)
+            }
+            
             calc.num1 = Float(self.upNum1) ?? 0
             
             clearNum()
@@ -638,17 +768,48 @@ struct Calculator_view: View {
         else{
             self.upNum1 = String(calc.result)
         }
+        if num1HasFraction && self.upNum1 == "0"{
+            self.upNum1 = ""
+        }
     }
     func displayFraction(){
         self.upFractionNumerator1 = String(calc.resultNumerator)
         self.upFractionDenominator1 = String(calc.resultDenominator)
+        self.upFraction1Slash = ""
         
         if self.upFractionNumerator1 == "0"{
             // Hides result fraction if no fration
             self.num1HasFraction = false
         }else {
             self.num1HasFraction = true
+            
+            //Settting up the correct sign for the result
+            if (self.upFractionNumerator1.contains("-") && self.upFractionDenominator1.contains("-")) || (!self.upFractionNumerator1.contains("-") && !self.upFractionDenominator1.contains("-")) {
+                
+                num1FractionIsNegative = false
+                
+                if self.upFractionNumerator1.contains("-"){
+                    self.upFractionNumerator1.removeFirst()
+                }
+                if self.upFractionDenominator1.contains("-"){
+                    self.upFractionDenominator1.removeFirst()
+                }
+                
+            }else {
+                
+                num1FractionIsNegative = true
+                
+                if self.upFractionNumerator1.contains("-"){
+                    self.upFractionNumerator1.removeFirst()
+                }
+                if self.upFractionDenominator1.contains("-"){
+                    self.upFractionDenominator1.removeFirst()
+                }
+            }
+                
+            
             var size = 0
+            
             if self.upFractionNumerator1.count >= self.upFractionDenominator1.count {
                 size = self.upFractionNumerator1.count
             }else {
@@ -659,15 +820,49 @@ struct Calculator_view: View {
             
         }
     }
-        
+    
+    
     func equal(){
+        // Converting result from decimal to fraction
+        if self.currOp == ""{
+            // intuping the fraction
+            if self.num1HasFraction{
+                calc.fraction1numerator = Int(self.upFractionNumerator1) ?? 0
+                calc.fraction1denominator = Int(self.upFractionDenominator1) ?? 0
+            }
+            // inputing number
+            calc.num1 = Float(self.upNum1) ?? 0
+            
+            // calculating decimal point location
+            if self.upNum1.contains("."){
+                calc.num1DecimalMultiplier = decimalPointLocator(number: self.upNum1)
+            }
+            
+            calc.resultConverter()
+            displayFraction()
+            displayNum()
+            calc.clear()
+        }
         
+        // Clearing Error
         if self.num == "Error" {self.num = "0"}
 
+        // Imputing fraction
         if self.num2HasFraction{
-            calc.fraction2numerator = Int(self.upFractionNumerator2) ?? 0
-            calc.fraction2denominator = Int(self.upFractionDenominator2) ?? 0
+            if self.num2FractionIsNegative{
+                calc.fraction2numerator = Int("-" + self.upFractionNumerator2) ?? 0
+                calc.fraction2denominator = Int(self.upFractionDenominator2) ?? 0
+            }else{
+                calc.fraction2numerator = Int(self.upFractionNumerator2) ?? 0
+                calc.fraction2denominator = Int(self.upFractionDenominator2) ?? 0
+            }
         }
+        
+        // calculating decimal point location
+        if self.upNum2.contains("."){
+            calc.num2DecimalMultiplier = decimalPointLocator(number: self.upNum2)
+        }
+        
         if self.upNum2 == "" {self.upNum2 = "0"}
         calc.num2 = Float(self.upNum2) ?? 0
         
@@ -675,22 +870,22 @@ struct Calculator_view: View {
         switch self.currOp{
         case "+":
             calc.add()
-            displayNum()
             displayFraction()
+            displayNum()
             calc.clear()
             self.currOp = ""
             break
         case "−":
             calc.substract()
-            displayNum()
             displayFraction()
+            displayNum()
             calc.clear()
             self.currOp = ""
             break
         case "×":
             calc.multiply()
-            displayNum()
             displayFraction()
+            displayNum()
             calc.clear()
             self.currOp = ""
             break
@@ -703,8 +898,8 @@ struct Calculator_view: View {
                 return
             }else{
                 calc.divide()
-                displayNum()
                 displayFraction()
+                displayNum()
                 calc.clear()
                 self.currOp = ""}
             break
@@ -714,69 +909,73 @@ struct Calculator_view: View {
         
         clearNum()
         clearNum2()
+        
     }
     func buttonTaped(number: String){
-        // Marking current number a decimal
-        if self.num.contains("."){self.numIsDecimal = true}else{self.numIsDecimal = false}
         
-        if typingNumerator && !self.numIsDecimal{
-            // Removing the zero
-            if self.numerator == "0" {
-                self.numerator = ""
-                self.fractionSlash = ""
-            }
-            // Typing numerator
-            self.numerator = "\(self.numerator)\(number)"
-            self.fractionSlash = "\(self.fractionSlash)" + "_"
-        }
-        
-        else if self.typingDenominator && !self.numIsDecimal{
-            // Removing one
-            if self.denominator == "1"{
-                self.denominator = ""
-            }
-            // Typing denominator
-            if denominator1WasPressed{
-                self.denominator = "1" + "\(number)"
-                denominator1WasPressed = false
-            }else{
-                self.denominator = "\(self.denominator)\(number)"
-            }
+            // Marking current number a decimal
+            if self.num.contains("."){self.numIsDecimal = true}else{self.numIsDecimal = false}
             
-            if self.denominator.count > numerator.count {
+            if typingNumerator && !self.numIsDecimal{
+                // Removing the zero
+                if self.numerator == "0" {
+                    self.numerator = ""
+                    self.fractionSlash = ""
+                }
+                // Typing numerator
+                self.numerator = "\(self.numerator)\(number)"
                 self.fractionSlash = "\(self.fractionSlash)" + "_"
             }
-            // Typing a one in the denominator
-            if number == "1" && self.denominator == "1"{
-                denominator1WasPressed = true
+            
+            else if self.typingDenominator && !self.numIsDecimal{
+                // Removing one
+                if self.denominator == "1"{
+                    self.denominator = ""
+                }
+                // Typing denominator
+                if denominator1WasPressed{
+                    self.denominator = "1" + "\(number)"
+                    denominator1WasPressed = false
+                }else{
+                    self.denominator = "\(self.denominator)\(number)"
+                }
+                
+                if self.denominator.count > numerator.count {
+                    self.fractionSlash = "\(self.fractionSlash)" + "_"
+                }
+                // Typing a one in the denominator
+                if number == "1" && self.denominator == "1"{
+                    denominator1WasPressed = true
+                }
+            }
+            
+            else if number == "." && self.num == "0"{
+                self.num = "\(self.num)\(number)"
+            }
+            else if self.num == "0" || self.num == "Error"{
+                self.num = ""
+                self.num = "\(self.num)\(number)"
+                // cleaning fraction if result had any
+                if self.currOp == ""{
+                    self.num1HasFraction = false
+                    self.upFractionNumerator1 = ""
+                    self.upFraction1Slash = ""
+                    self.upFractionDenominator1 = ""
+                }
+            }
+            else{
+                if self.num.count < 9{
+                    self.num = "\(self.num)\(number)"
+                }
+            }
+            
+            // Copying the num to the top views
+            if self.currOp.isEmpty{
+                copyNumToNum1()
+            }else{
+                copyNumToNum2()
             }
         }
-        
-        else if number == "." && self.num == "0"{
-            self.num = "\(self.num)\(number)"
-        }
-        else if self.num == "0" || self.num == "Error"{
-            self.num = ""
-            self.num = "\(self.num)\(number)"
-            // cleaning fraction if result had any
-            if self.currOp == ""{
-                self.num1HasFraction = false
-                self.upFractionNumerator1 = ""
-                self.upFraction1Slash = ""
-                self.upFractionDenominator1 = ""
-            }
-        }
-        else{
-            self.num = "\(self.num)\(number)"
-        }
-        
-        // Copying the num to the top views
-        if self.currOp.isEmpty{
-            copyNumToNum1()
-        }else{
-            copyNumToNum2()
-        }
-
     }
     
     struct Calculator_view_Previews: PreviewProvider {
@@ -786,17 +985,19 @@ struct Calculator_view: View {
         static var previews: some View {
             Calculator_view(detector: detector).environmentObject(detector)
         }
-    }
+    
 }
 
 class Calculator{
     var num1:Float = 0
     var fraction1numerator:Int = 0
     var fraction1denominator:Int = 0
+    var num1DecimalMultiplier:Float = 0
     
     var num2:Float = 0
     var fraction2numerator:Int = 0
     var fraction2denominator:Int = 0
+    var num2DecimalMultiplier:Float = 0
     
     var result:Float = 0
     var resultNumerator: Int = 0
@@ -810,14 +1011,38 @@ class Calculator{
         else {return gcd(num1:num2, num2:num1 % num2)}
     }
     
+    // Result converter from fraction to decimal and viceversa
+    func resultConverter(){
+        if fraction1numerator == 0 && fraction1denominator == 0{
+            resultNumerator = Int(num1 * num1DecimalMultiplier)
+            resultDenominator = Int(num1DecimalMultiplier)
+            fractionSimplifier()
+        }else{
+            mixToFraction()
+            result = Float(fraction1numerator) / Float(fraction1denominator)
+        }
+    }
+    
     // Improper fraction builder
     func mixToFraction(){
         if num1 != 0 && fraction1numerator != 0{
-            fraction1numerator = (fraction1denominator * Int(num1)) + fraction1numerator
-            num1 = 0
-        }else if num2 != 0 && fraction2numerator != 0{
-            fraction2numerator = (fraction2denominator * Int(num2)) + fraction2numerator
-            num2 = 0
+            if num1 > 0{
+                fraction1numerator = (fraction1denominator * Int(num1)) + fraction1numerator
+                num1 = 0}
+            else{
+                fraction1numerator = -1 * ( -1 * (fraction1denominator * Int(num1)) + fraction1numerator)
+                num1 = 0
+            }
+        }
+        
+        if num2 != 0 && fraction2numerator != 0{
+            if num2 > 0{
+                fraction2numerator = (fraction2denominator * Int(num2)) + fraction2numerator
+                num2 = 0}
+            else{
+                fraction2numerator = -1 * ( -1 * (fraction2denominator * Int(num2)) + fraction2numerator)
+                num2 = 0
+            }
         }
     }
     
@@ -830,26 +1055,23 @@ class Calculator{
                 fraction2numerator = Int(num2)
                 fraction2denominator = 1
                 num2 = 0
+            }else{
+                fraction2numerator = Int(num2 * num2DecimalMultiplier)
+                fraction2denominator = Int(num2DecimalMultiplier)
+                num2 = 0
             }
-            // Working on operation between decimals and fractions
-//            else{
-//                var count = 0
-//                var num2Str = String(num2)
-//                for {
-//                    num2 = num2 * 10
-//                    count += 1
-//                }
-//
-//                fraction2numerator = Int(num2)
-//            }
-//             // needs to change to allow decimal operations with fractions
-//
-
         }
         else if fraction1numerator == 0  && fraction1denominator == 0{
-            fraction1numerator = Int(num1) // needs to change to allow decimal operations with fractions
-            fraction1denominator = 1
-            num1 = 0
+            
+            if num1 == floor(num1){
+                fraction1numerator = Int(num1)
+                fraction1denominator = 1
+                num1 = 0
+            }else {
+                fraction1numerator = Int(num1 * num1DecimalMultiplier)
+                fraction1denominator = Int(num1DecimalMultiplier)
+                num1 = 0
+            }
         }
         // Accounting for fractions with a 0 numerator
         else if fraction2numerator == 0  && fraction2denominator != 0{
@@ -874,6 +1096,12 @@ class Calculator{
         if resultNumerator > resultDenominator{
             result += Float(resultNumerator / resultDenominator)
             resultNumerator = resultNumerator % resultDenominator
+            if resultDenominator < 0{
+                resultDenominator *= -1
+            }
+        }else if resultNumerator < 0{
+            result += Float(resultNumerator / resultDenominator)
+            resultNumerator = -1 * (resultNumerator % resultDenominator)
         }
     }
     
