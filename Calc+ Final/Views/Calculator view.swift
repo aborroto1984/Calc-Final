@@ -103,6 +103,15 @@ struct Calculator_view: View {
     @State var num2IsSquare = false
     @State var numIsSquare = false
     
+    @State var fractionButtonImage = "emptyFractionButton"
+    
+    @State var copyNum = ""
+    @State var copyNumerator = ""
+    @State var copyDenominator = ""
+    @State var copyFractionSlash = ""
+    @State var copyIsNumNegative = false
+    @State var copyIsFractionNegative = false
+    
     var body: some View {
         
         VStack{
@@ -139,30 +148,6 @@ struct Calculator_view: View {
             .padding()
             
             
-            
-            HStack{
-                
-                Button(action: {
-                    
-                }, label: {Image("feetButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
-                
-                Button(action: {
-                    
-                }, label: {Image("inchButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
-                
-                Button(action: {
-                    
-                }, label: {Image("yardButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
-                
-                Button(action: {
-                    
-                }, label: {Image("copyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
-                
-                Button(action: {
-                    
-                }, label: {Image("pasteButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
-            }
-            
             HStack{
                 Button(action: {clear()
                     
@@ -181,7 +166,7 @@ struct Calculator_view: View {
                 
                 Button(action: {
                     
-                }, label: {Image("squareRootButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("pasteBigButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
             }
             
             HStack{
@@ -201,9 +186,9 @@ struct Calculator_view: View {
                     
                 }, label: {Image("multiplyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {squared()
+                Button(action: {
                     
-                }, label: {Image("squareButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("copyBigButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
             }
             
             HStack{
@@ -223,9 +208,9 @@ struct Calculator_view: View {
                     
                 }, label: {Image("minusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {plusMinus()
+                Button(action: {squared()
                     
-                }, label: {Image("plusMinusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("squareButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
             }
             
             HStack{
@@ -245,9 +230,9 @@ struct Calculator_view: View {
                     
                 }, label: {Image("plusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {if !numIsDecimal{typingAFraction()}
+                Button(action: {plusMinus()
                     
-                }, label: {Image("emptyFractionButton").resizable().scaledToFit()})
+                }, label: {Image("plusMinusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
             }
             
@@ -264,9 +249,15 @@ struct Calculator_view: View {
                     
                 }, label: {Image("deleteButton").resizable().scaledToFit()})
                 
+                
+                Button(action: {if !numIsDecimal{typingAFraction()}
+                    
+                }, label: {Image( self.fractionButtonImage
+                ).resizable().scaledToFit()})
+                
                 Button(action: {equal()
                     
-                }, label: {Image("equalBigButton").scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("equalButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
                 
                 
@@ -274,6 +265,7 @@ struct Calculator_view: View {
         }.onAppear{UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation"); AppDelegate.orientationLock = .portrait}.padding()
     }
     // Views-------------------------------------------------------------------------
+    
     var num1View: some View{
         Group{
             if num1IsSquare && num1HasFraction{ Text("(").font(.system(size: 35))}
@@ -386,6 +378,19 @@ struct Calculator_view: View {
         }
     }
     // Functions---------------------------------------------------------------------
+    func fractionButtonImageUpdater(){
+        // Updating button image according to state
+        if self.typingNumerator{
+            self.fractionButtonImage = "denominatorButton"
+        }
+        else if self.typingDenominator{
+            self.fractionButtonImage = "exitButton"
+        }
+        else{
+            self.fractionButtonImage = "emptyFractionButton"
+        }
+    }
+    
     func squared(){
         // Typing firt number
         if self.currOp == ""{
@@ -394,6 +399,10 @@ struct Calculator_view: View {
             self.num2IsSquare = !self.num2IsSquare
         }
         self.numIsSquare = !self.numIsSquare
+    }
+    
+    func copy(){
+        // TODO
     }
     
     func plusMinus(){
@@ -466,7 +475,7 @@ struct Calculator_view: View {
     }
     
     func typingAFraction(){
-
+        
         if self.typingaFractionState == 0{
             self.typingNumerator = true
             self.numHasFraction = true
@@ -517,32 +526,9 @@ struct Calculator_view: View {
             self.typingNumerator = false
             self.typingDenominator = false
             self.typingaFractionState = 0
-            
-            
-            
-            
-            // Filling empty with zero
-//            if self.num1HasFraction{
-//                if self.upFractionNumerator1.isEmpty{
-//                    self.upFractionNumerator1 = "0"
-//                    self.numerator = "0"
-//                }
-//                else if self.upFractionDenominator1.isEmpty{
-//                    self.upFractionDenominator1 = "0"
-//                    self.denominator = "0"
-//                }
-//            }
-//            else if self.num2HasFraction{
-//                if self.upFractionNumerator2.isEmpty{
-//                    self.upFractionNumerator2 = "0"
-//                    self.numerator = "0"
-//                }
-//                else if self.upFractionDenominator2.isEmpty{
-//                    self.upFractionDenominator2 = "0"
-//                    self.denominator = "0"
-//                }
-//            }
         }
+        
+        fractionButtonImageUpdater()
     }
     
     // Clear helper fuctions
