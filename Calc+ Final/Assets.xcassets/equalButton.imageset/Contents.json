@@ -6,12 +6,45 @@
       "scale" : "1x"
     },
     {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "equalButton 1.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
       "filename" : "equalButton@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "equalButton@2x 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
       "filename" : "equalButton@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "equalButton@3x 1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

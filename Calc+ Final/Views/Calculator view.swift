@@ -6,30 +6,6 @@
 //
 
 import SwiftUI
-enum numerator: String{
-    case upZero  = "⁰"
-    case upOne   = "¹"
-    case upTwo   = "²"
-    case upThree = "³"
-    case upFour  = "⁴"
-    case upFive  = "⁵"
-    case upSix   = "⁶"
-    case upSeven = "⁷"
-    case upEight = "⁸"
-    case upNine  = "⁹"
-}
-enum denominator: String{
-    case downZero  = "₀"
-    case downOne   = "₁"
-    case downTwo   = "₂"
-    case downThree = "₃"
-    case downFour  = "₄"
-    case downFive  = "₅"
-    case downSix   = "₆"
-    case downSeven = "₇"
-    case downEight = "₈"
-    case downNine  = "₉"
-}
 
 enum operators: String{
     case add       = "+"
@@ -67,42 +43,42 @@ struct Calculator_view: View {
     @State var upFraction1Slash = ""
     @State var upFractionDenominator1 = ""
     @State var upUnit1 = ""
-    
+
     @State var currOp = ""
-    
+
     @State var upNum2 = ""
     @State var upFractionNumerator2 = ""
     @State var upFraction2Slash = ""
     @State var upFractionDenominator2 = ""
     @State var upUnit2 = ""
-    
+
     @State var num = "0"
     @State var numerator = ""
     @State var fractionSlash = ""
     @State var denominator = ""
     @State var unit = ""
-    
+
     @State var num1HasFraction = false
     @State var num2HasFraction = false
     @State var numHasFraction = false
-    
+
     @State var num1HasUnit = false
     @State var num2HasUnit = false
     @State var numHasUnit = false
-    
+
     @State var numIsDecimal = false
-    
+
     @State var numIsNegative = false
     @State var fractionIsNegative = false
     @State var num1IsNegative = false
     @State var num1FractionIsNegative = false
     @State var num2IsNegative = false
     @State var num2FractionIsNegative = false
-    
+
     @State var num1IsSquare = false
     @State var num2IsSquare = false
     @State var numIsSquare = false
-    
+
     @State var fractionButtonImage = "emptyFractionButton"
     
     @State var copyNum = ""
@@ -110,7 +86,52 @@ struct Calculator_view: View {
     @State var copyDenominator = ""
     @State var copyFractionSlash = ""
     @State var copyIsNumNegative = false
+    @State var copyNumHasFraction = false
     @State var copyIsFractionNegative = false
+    @State var copyNumIsSquare = false
+    @State var numberStoredText = ""
+    
+    // Aligments test
+//    @State var upNum1 = "-36"
+//    @State var upFractionNumerator1 = "10"
+//    @State var upFraction1Slash = "__"
+//    @State var upFractionDenominator1 = "3"
+//    @State var upUnit1 = ""
+//
+//    @State var currOp = "+"
+//
+//    @State var upNum2 = "-46"
+//    @State var upFractionNumerator2 = "14"
+//    @State var upFraction2Slash = "___"
+//    @State var upFractionDenominator2 = "10"
+//    @State var upUnit2 = ""
+//
+//    @State var num = "400"
+//    @State var numerator = "234"
+//    @State var fractionSlash = "___"
+//    @State var denominator = "35"
+//    @State var unit = ""
+//
+//    @State var num1HasFraction = true
+//    @State var num2HasFraction = true
+//    @State var numHasFraction = true
+//
+//    @State var num1HasUnit = false
+//    @State var num2HasUnit = false
+//    @State var numHasUnit = false
+//
+//    @State var numIsDecimal = false
+//
+//    @State var numIsNegative = true
+//    @State var fractionIsNegative = false
+//    @State var num1IsNegative = true
+//    @State var num1FractionIsNegative = false
+//    @State var num2IsNegative = true
+//    @State var num2FractionIsNegative = false
+//
+//    @State var num1IsSquare = true
+//    @State var num2IsSquare = true
+//    @State var numIsSquare = true
     
     var body: some View {
         
@@ -118,11 +139,11 @@ struct Calculator_view: View {
             
             ZStack{
                 
-                HStack{
-                    Image("menu").padding(.leading)
-                    Spacer()
-                    
-                }
+//                HStack{
+//                    Image("menu").padding(.leading)
+//                    Spacer()
+//
+//                }
                 
                 Text("Calculator")
                 
@@ -142,7 +163,10 @@ struct Calculator_view: View {
                 Spacer()
 // Bottom number----------------------------------------------------------------------
                 numView
-                
+                HStack{
+                    Text(self.numberStoredText).frame(height:1)
+                    Spacer()
+                }
             }
             .frame(width: .infinity)
             .padding()
@@ -164,7 +188,7 @@ struct Calculator_view: View {
                 Button(action: {transferValue(op: "÷")
                 }, label: {Image("divideButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {
+                Button(action: {paste()
                     
                 }, label: {Image("pasteBigButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
             }
@@ -186,7 +210,7 @@ struct Calculator_view: View {
                     
                 }, label: {Image("multiplyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
-                Button(action: {
+                Button(action: {copy()
                     
                 }, label: {Image("copyBigButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
             }
@@ -280,21 +304,21 @@ struct Calculator_view: View {
                     // Number 1 Fraction is negative
                     if num1FractionIsNegative{ Text("-")}
                     ZStack{
-                        Text(self.upFractionNumerator1).offset(y:-13)
+                        Text(self.upFractionNumerator1).offset(y:-15)
                         Text(self.upFraction1Slash).offset(y:-9)
-                        Text(self.upFractionDenominator1).offset(y:13)
+                        Text(self.upFractionDenominator1).offset(y:18)
                     }
-                }.font(.system(size:20))
+                }.font(.system(size:25))
                     .lineLimit(1)
                 
             }
             // Number 1 unit or is squared
             if num1IsSquare && num1HasFraction{ Text(")").font(.system(size: 35))}
-            if num1IsSquare{Text("²").font(.system(size: 35))}
+            if num1IsSquare{Text("²").font(.system(size: 35)).offset(x:-5, y: -10)}
             if num1HasUnit{Text(self.upUnit1)}
             
             // Operator
-            Text(self.currOp).font(.system(size:35))
+            Text(self.currOp).font(.system(size:30))
                 .lineLimit(1)
         }
     }
@@ -312,7 +336,7 @@ struct Calculator_view: View {
                     
                     
                     // If number is negative
-                    if self.num2IsNegative && !self.num2HasFraction{ Text(")") }
+                    //if self.num2IsNegative && !self.num2HasFraction{ Text(")") }
                     
                 }.font(.system(size: 35))
                     .lineLimit(1)
@@ -324,14 +348,14 @@ struct Calculator_view: View {
                 HStack{
                     // Number 2 Fraction is negative
                     if num2FractionIsNegative{
-                            Text("-").font(.system(size: 35))
+                            Text("-").font(.system(size: 25))
                     }
                     
                     ZStack{
-                        Text(self.upFractionNumerator2).offset(y:-13)
+                        Text(self.upFractionNumerator2).offset(y:-15)
                         Text(self.upFraction2Slash).offset(y:-9)
-                        Text(self.upFractionDenominator2).offset(y:13)
-                    }.font(.system(size:20))
+                        Text(self.upFractionDenominator2).offset(y:18)
+                    }.font(.system(size:25))
                         .lineLimit(1)
                 }
                     
@@ -340,7 +364,7 @@ struct Calculator_view: View {
             if self.num2FractionIsNegative || self.num2IsNegative || self.num2IsSquare{ Text(")").font(.system(size: 35))}
             
             // Number 2 unit or is squared
-            if num2IsSquare{Text("²").font(.system(size: 35))}
+            if num2IsSquare{Text("²").font(.system(size: 35)).offset(x:-5, y: -10)}
             if num2HasUnit{Text(self.upUnit2)}
         }
     }
@@ -369,15 +393,38 @@ struct Calculator_view: View {
                         }
                     }
                         .font(.system(size: 35))
+                        .bold()
                         .lineLimit(1)
                 }
                 if self.numIsSquare && self.numHasFraction{ Text(")").font(.system(size: 70))}
-                if numIsSquare{Text("²").font(.system(size: 70))}
+                if numIsSquare{Text("²").font(.system(size: 70)).offset(x:-5, y: -10)}
                 if numHasUnit{Text(self.unit)}
             }
         }
     }
     // Functions---------------------------------------------------------------------
+    func noNumber()->Bool{
+        if self.num == "0" && !self.numHasFraction{
+            return true
+        }else{
+            return false
+        }
+    }
+    func noNum1()->Bool{
+        if self.upNum1 == "0" && !self.num1HasFraction{
+            return true
+        }else{
+            return false
+        }
+    }
+    func noNum2()->Bool{
+        if self.upNum2 == "" && !self.num2HasFraction{
+            return true
+        }else{
+            return false
+        }
+    }
+    
     func fractionButtonImageUpdater(){
         // Updating button image according to state
         if self.typingNumerator{
@@ -402,9 +449,65 @@ struct Calculator_view: View {
     }
     
     func copy(){
-        // TODO
+        
+        if noNum2(){
+            self.copyNum = self.upNum1
+            self.copyNumerator = self.upFractionNumerator1
+            self.copyDenominator = self.upFractionDenominator1
+            self.copyFractionSlash = self.upFraction1Slash
+            self.copyIsNumNegative = self.num1IsNegative
+            self.copyIsFractionNegative = self.num1FractionIsNegative
+            self.copyNumHasFraction = self.num1HasFraction
+            self.copyNumIsSquare = self.num1IsSquare
+            self.numberStoredText = "number stored"
+        }
+        else if noNumber() && !noNum1() || !noNum1() && !noNum2(){
+            self.copyNum = self.num
+            self.copyNumerator = self.numerator
+            self.copyDenominator = self.denominator
+            self.copyFractionSlash = self.fractionSlash
+            self.copyIsNumNegative = self.numIsNegative
+            self.copyIsFractionNegative = self.fractionIsNegative
+            self.copyNumHasFraction = self.numHasFraction
+            self.copyNumIsSquare = self.numIsSquare
+            self.numberStoredText = "number stored"
+        }
     }
-    
+    func paste(){
+        if self.numberStoredText != ""{
+            if self.currOp == ""{
+                self.upNum1 = self.copyNum
+                self.upFractionNumerator1 = self.copyNumerator
+                self.upFractionDenominator1 = self.copyDenominator
+                self.upFraction1Slash = self.copyFractionSlash
+                self.num1IsNegative = self.copyIsNumNegative
+                self.num1FractionIsNegative = self.copyIsFractionNegative
+                self.num1HasFraction = self.copyNumHasFraction
+                self.num1IsSquare = self.copyNumIsSquare
+                self.numberStoredText = ""
+            }
+            else{
+                self.upNum2 = self.copyNum
+                self.upFractionNumerator2 = self.copyNumerator
+                self.upFractionDenominator2 = self.copyDenominator
+                self.upFraction2Slash = self.copyFractionSlash
+                self.num2IsNegative = self.copyIsNumNegative
+                self.num2FractionIsNegative = self.copyIsFractionNegative
+                self.num2HasFraction = self.copyNumHasFraction
+                self.num2IsSquare = self.copyNumIsSquare
+                self.numberStoredText = ""
+            }
+            // Clearing memory
+            self.copyNum = ""
+            self.copyNumerator = ""
+            self.copyDenominator = ""
+            self.copyFractionSlash = ""
+            self.copyIsNumNegative = false
+            self.copyIsFractionNegative = false
+            self.copyNumHasFraction = false
+            self.copyNumIsSquare = false
+        }
+    }
     func plusMinus(){
         // Typing firt number
         if self.currOp == ""{
@@ -418,6 +521,7 @@ struct Calculator_view: View {
             else{
                 // Turning negative signal off and on
                 self.numIsNegative = !self.numIsNegative
+                self.num1IsNegative = !self.num1IsNegative
                 
                 if self.numIsNegative{
                     self.num = "-" + self.num
@@ -585,6 +689,7 @@ struct Calculator_view: View {
                 
                 self.typingaFractionState = 0
                 if self.num == ""{ self.num = "0"}
+                fractionButtonImageUpdater()
             }
             
             self.numerator = "0"
@@ -595,6 +700,7 @@ struct Calculator_view: View {
             }
             else{
                 copyNumToNum2()}
+            
         }
         
         else if self.typingDenominator{
@@ -999,7 +1105,7 @@ struct Calculator_view: View {
             else if number == "." && self.num == "0"{
                 self.num = "\(self.num)\(number)"
             }
-            else if self.num == "0" || self.num == "Error"{
+        else if self.num == "0" || self.num == "Error"{
                 self.num = ""
                 self.num = "\(self.num)\(number)"
                 // cleaning fraction if result had any
@@ -1011,7 +1117,10 @@ struct Calculator_view: View {
                 }
             }
             else{
-                if self.num.count < 9{
+                if self.num == "-0"{
+                    self.num = "-"
+                }
+                if self.num.count < 9 && !self.numHasFraction{
                     self.num = "\(self.num)\(number)"
                 }
             }

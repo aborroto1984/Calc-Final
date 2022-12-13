@@ -6,12 +6,45 @@
       "scale" : "1x"
     },
     {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "deleteButton 1.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
       "filename" : "deleteButton@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "deleteButton@2x 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
       "filename" : "deleteButton@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "deleteButton@3x 1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
