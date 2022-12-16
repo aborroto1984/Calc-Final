@@ -854,7 +854,9 @@ struct Calculator_view: View {
         
         // Safe guards against multiple opperators
         if self.currOp != "" {
-            return
+            // Performing calculation if operator is tapped
+            equal()
+            transferValue(op: op)
         }
         else{
             self.currOp = op
