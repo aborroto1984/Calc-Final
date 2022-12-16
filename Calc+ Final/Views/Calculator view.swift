@@ -256,7 +256,7 @@ struct Calculator_view: View {
                 
                 Button(action: {plusMinus()
                     
-                }, label: {Image("plusMinusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("plusMinusBigButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
                 
             }
             
@@ -719,6 +719,8 @@ struct Calculator_view: View {
             if self.num2HasFraction{
                 copyNumToNum2()}
             else{copyNumToNum1()}
+            
+            fractionButtonImageUpdater()
         }
         
         else if self.currOp == ""{
@@ -746,6 +748,7 @@ struct Calculator_view: View {
         clearNum2()
         self.currOp = ""
     }
+    
     func back(){
         // Deleting numbers while writing a fraction
         if typingNumerator{
@@ -892,7 +895,7 @@ struct Calculator_view: View {
             self.upNum1 = String(Int(calc.result))
         }
         else{
-            self.upNum1 = String(calc.result)
+            self.upNum1 = String(round(calc.result * 10000) / 10000.0)
         }
         if num1HasFraction && self.upNum1 == "0"{
             self.upNum1 = ""
