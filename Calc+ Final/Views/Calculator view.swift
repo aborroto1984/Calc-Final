@@ -81,6 +81,14 @@ struct Calculator_view: View {
     @State var num1power = ""
     @State var num2power = ""
     @State var numPower = ""
+    @State var typingPower = false
+    
+    @State var num1Sqroot = false
+    @State var num2Sqroot = false
+    @State var numSqroot = false
+    @State var num1Rootdash = ""
+    @State var num2Rootdash = ""
+    @State var numRootdash = ""
     
     @State var fractionButtonImage = "emptyFractionButton"
     
@@ -96,7 +104,7 @@ struct Calculator_view: View {
     
     
     // Aligments test
-//    @State var upNum1 = "-36"
+//    @State var upNum1 = "36"
 //    @State var upFractionNumerator1 = "10"
 //    @State var upFraction1Slash = "__"
 //    @State var upFractionDenominator1 = "3"
@@ -104,20 +112,20 @@ struct Calculator_view: View {
 //
 //    @State var currOp = "+"
 //
-//    @State var upNum2 = "-46"
-//    @State var upFractionNumerator2 = "14"
-//    @State var upFraction2Slash = "___"
-//    @State var upFractionDenominator2 = "10"
+//    @State var upNum2 = "63"
+//    @State var upFractionNumerator2 = "9"
+//    @State var upFraction2Slash = "_"
+//    @State var upFractionDenominator2 = "9"
 //    @State var upUnit2 = ""
 //
 //    @State var num = "400"
-//    @State var numerator = "234"
-//    @State var fractionSlash = "___"
-//    @State var denominator = "35"
+//    @State var numerator = "2"
+//    @State var fractionSlash = "_"
+//    @State var denominator = "3"
 //    @State var unit = ""
 //
 //    @State var num1HasFraction = true
-//    @State var num2HasFraction = true
+    //@State var num2HasFraction = true
 //    @State var numHasFraction = true
 //
 //    @State var num1HasUnit = false
@@ -180,22 +188,22 @@ struct Calculator_view: View {
             HStack{
                 Button(action: {clear()
                     
-                }, label: {Image("feetButton").resizable().scaledToFit()})
+                }, label: {Image("feetButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {clearAll()
                     
-                }, label: {Image("inchButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("inchButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {transferValue(op: "% of")
                     
-                }, label: {Image("yardButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("yardButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {transferValue(op: "÷")
-                }, label: {Image("copyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("copyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {paste()
                     
-                }, label: {Image("pasteButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("pasteButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
             }
             
             HStack{
@@ -205,18 +213,18 @@ struct Calculator_view: View {
                 
                 Button(action: {clearAll()
                     
-                }, label: {Image("clearAllButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("clearAllButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {transferValue(op: "% of")
                     
-                }, label: {Image("percentButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("percentButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {transferValue(op: "÷")
-                }, label: {Image("divideButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("divideButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
-                Button(action: {paste()
+                Button(action: {sqroot()
                     
-                }, label: {Image("sqrootButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("sqrootButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
             }
             
             HStack{
@@ -234,11 +242,11 @@ struct Calculator_view: View {
                 
                 Button(action: {transferValue(op: "×")
                     
-                }, label: {Image("multiplyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("multiplyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
-                Button(action: {
+                Button(action: {toThePower()
                     
-                }, label: {Image("powerButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image(typingPower ?  "exitButton" : "powerButton" ).resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator  ? 0 : 1)
             }
             
             HStack{
@@ -256,11 +264,11 @@ struct Calculator_view: View {
                 
                 Button(action: {transferValue(op: "−")
                     
-                }, label: {Image("minusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("minusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {squared()
                     
-                }, label: {Image("squareButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("squareButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
             }
             
             HStack{
@@ -278,11 +286,11 @@ struct Calculator_view: View {
                 
                 Button(action: {transferValue(op: "+")
                     
-                }, label: {Image("plusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("plusButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {plusMinus()
                     
-                }, label: {Image("plusMinusBigButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("plusMinusBigButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
             }
             
@@ -293,7 +301,7 @@ struct Calculator_view: View {
                 
                 Button(action: {buttonTaped(number: ".")
                     
-                }, label: {Image("pointButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("pointButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {back()
                     
@@ -303,11 +311,11 @@ struct Calculator_view: View {
                 Button(action: {if !numIsDecimal{typingAFraction()}
                     
                 }, label: {Image( self.fractionButtonImage
-                ).resizable().scaledToFit()})
+                ).resizable().scaledToFit()}).opacity(typingPower ? 0 : 1)
                 
                 Button(action: {equal()
                     
-                }, label: {Image("equalButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator ? 0 : 1)
+                }, label: {Image("equalButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 
                 
@@ -318,113 +326,180 @@ struct Calculator_view: View {
     
     var num1View: some View{
         Group{
-            if num1IsSquare && num1HasFraction{ Text("(").font(.system(size: 40))}
-            Text(self.upNum1)
-                .font(.system(size: 35))
-                .lineLimit(1)
-            
-            
-            // Number 1 Fraction
-            if num1HasFraction{
-                HStack{
-                    // Number 1 Fraction is negative
-                    if num1FractionIsNegative{ Text("-")}
-                    ZStack{
-                        Text(self.upFractionNumerator1).offset(y:-15)
-                        Text(self.upFraction1Slash).offset(y:-9)
-                        Text(self.upFractionDenominator1).offset(y:18)
-                    }
-                }.font(.system(size:25))
-                    .lineLimit(1)
+            if num1Sqroot && num1HasFraction{
                 
+                Text("√").font(.system(size: 63)).offset(x: 14)
             }
-            // Number 1 unit or is squared
-            if num1IsSquare && num1HasFraction{ Text(")").font(.system(size: 40))}
-            if num1IsSquare{Text(self.num1power).font(.system(size: 15)).offset(x:-5, y: -10)}
-            if num1HasUnit{Text(self.upUnit1)}
-            
+            else if num1Sqroot{
+                Group{
+                    ZStack{
+                        Text("√").font(.system(size: 40)).offset(x: 10)
+                        //Text("_").font(.system(size: 40)).offset(x: 20, y: -39)
+                        
+                    }
+                }
+            }
+            ZStack{
+                Group{
+                    if num1Sqroot && num1HasFraction{
+                        Text(self.num1Rootdash).bold().font(.system(size: 50)).offset(x: 0, y: -55)
+                    }else if num1Sqroot{
+                        Text(self.num1Rootdash).font(.system(size: 40)).offset(x: 0, y: -39)
+                    }}
+                Group{
+                    HStack{
+                        if num1IsSquare && num1HasFraction{ Text("(").font(.system(size: 40))}
+                        Text(self.upNum1)
+                            .font(.system(size: 35))
+                            .lineLimit(1)
+                        
+                        
+                        // Number 1 Fraction
+                        if num1HasFraction{
+                            HStack{
+                                // Number 1 Fraction is negative
+                                if num1FractionIsNegative{ Text("-")}
+                                ZStack{
+                                    Text(self.upFractionNumerator1).offset(y:-15)
+                                    Text(self.upFraction1Slash).offset(y:-9)
+                                    Text(self.upFractionDenominator1).offset(y:18)
+                                }
+                            }.font(.system(size:25))
+                                .lineLimit(1)
+                            
+                        }
+                        // Number 1 unit or is squared
+                        if num1IsSquare && num1HasFraction{ Text(")").font(.system(size: 40))}
+                        if num1IsSquare{Text(self.num1power).font(.system(size: 15)).offset(x:-5, y: -10)}
+                        if num1HasUnit{Text(self.upUnit1)}
+                    }
+                }.frame(width: .infinity)
+            }
             // Operator
             Text(self.currOp).font(.system(size:30))
                 .lineLimit(1)
         }
     }
-    
+//---------------------------------------------------------------------------------------------
     var num2View: some View{
         Group{
-            // If number is negative
-            if self.num2IsNegative || self.num2IsSquare || self.num2FractionIsNegative{ Text("(").font(.system(size: 40)) }
-            
-            if self.upNum2 != ""{
+            Group{
+                if num2Sqroot && num2HasFraction{
+                    
+                    Text("√").font(.system(size: 63)).offset(x: 14)
+                }
+                else if num2Sqroot{
+                    ZStack{
+                        Text("√").font(.system(size: 40)).offset(x: 10)
+                        //Text("_").font(.system(size: 40)).offset(x: 20, y: -39)
+                        
+                    }
+                }}
+            ZStack{
                 Group{
-                    
-                    
-                    Text(self.upNum2)
-                    
-                    
-                    // If number is negative
-                    //if self.num2IsNegative && !self.num2HasFraction{ Text(")") }
-                    
-                }.font(.system(size: 35))
-                    .lineLimit(1)
-                    
-            }
-            
-            // number 2 fraction
-            if num2HasFraction{
+                    if num2Sqroot && num2HasFraction{
+                        Text(self.num2Rootdash).font(.system(size: 50)).offset(x: 0, y: -55)
+                    }else if num2Sqroot{
+                        Text(self.num2Rootdash).font(.system(size: 40)).offset(x: 0, y: -39)
+                    }}
                 HStack{
-                    // Number 2 Fraction is negative
-                    if num2FractionIsNegative{
-                            Text("-").font(.system(size: 25))
+                    // If number is negative
+                    if self.num2IsNegative || self.num2IsSquare || self.num2FractionIsNegative{ Text("(").font(.system(size: 40)) }
+                    
+                    if self.upNum2 != ""{
+                        Group{
+                            
+                            
+                            Text(self.upNum2)
+                            
+                            
+                        }.font(.system(size: 35))
+                            .lineLimit(1)
+                        
                     }
                     
-                    ZStack{
-                        Text(self.upFractionNumerator2).offset(y:-15)
-                        Text(self.upFraction2Slash).offset(y:-9)
-                        Text(self.upFractionDenominator2).offset(y:18)
-                    }.font(.system(size:25))
-                        .lineLimit(1)
-                }
+                    // number 2 fraction
+                    if num2HasFraction{
+                        HStack{
+                            // Number 2 Fraction is negative
+                            if num2FractionIsNegative{
+                                Text("-").font(.system(size: 25))
+                            }
+                            
+                            ZStack{
+                                Text(self.upFractionNumerator2).offset(y:-15)
+                                Text(self.upFraction2Slash).offset(y:-9)
+                                Text(self.upFractionDenominator2).offset(y:18)
+                            }.font(.system(size:25))
+                                .lineLimit(1)
+                        }
+                        
+                    }
+                    // Number 2 Fraction is negative
+                    if self.num2FractionIsNegative || self.num2IsNegative || self.num2IsSquare{ Text(")").font(.system(size: 40))}
                     
+                    // Number 2 unit or is squared
+                    if num2IsSquare{Text(self.num2power).font(.system(size: 15)).offset(x:-5, y: -10)}
+                    if num2HasUnit{Text(self.upUnit2)}
+                }
             }
-            // Number 2 Fraction is negative
-            if self.num2FractionIsNegative || self.num2IsNegative || self.num2IsSquare{ Text(")").font(.system(size: 40))}
-            
-            // Number 2 unit or is squared
-            if num2IsSquare{Text(self.num2power).font(.system(size: 15)).offset(x:-5, y: -10)}
-            if num2HasUnit{Text(self.upUnit2)}
         }
     }
-    
+//---------------------------------------------------------------------------------------------
+
     var numView: some View{
         Group{
             HStack{
-                if self.num.count < 8 {Spacer()}
-                
-                if self.numIsSquare && self.numHasFraction{ Text("(").font(.system(size: 70))}
-                // Number
-                Text(self.num)
+                Group{
+                    if self.num.count < 8 {Spacer()}
                     
-                    .font(.system(size: 70))
-                    .lineLimit(1)
-                // Number fraction
-                if numHasFraction {
-                    HStack{
-                        // Number Fraction is negative
-                        if fractionIsNegative{ Text("-")}
+                    if numSqroot && numHasFraction{
                         
-                        ZStack{
-                            Text(self.numerator).offset(y: -20)
-                            Text(self.fractionSlash).offset(y: -15)
-                            Text(self.denominator).offset(y: 20)
-                        }
+                        Text("√").font(.system(size: 75)).offset(x: 14)
+                        
                     }
-                        .font(.system(size: 35))
-                        .bold()
-                        .lineLimit(1)
-                }
-                if self.numIsSquare && self.numHasFraction{ Text(")").font(.system(size: 70))}
-                if numIsSquare{Text(self.numPower).font(.system(size: 30)).offset(x:-5, y: -10)}
-                if numHasUnit{Text(self.unit)}
+                    else if numSqroot{
+                        ZStack{
+                            Text("√").font(.system(size: 60)).offset(x: 13)
+                            //Text("_").font(.system(size: 60)).offset(x: 35, y: -58)
+                            
+                        }
+                    }}
+                ZStack{
+                    Group{
+                        if numSqroot && numHasFraction{
+                            Text(self.numRootdash).font(.system(size: 69)).offset(x:0, y: -70)
+                        }else if numSqroot{
+                            Text(self.numRootdash).font(.system(size: 64)).offset(x: 0, y: -60)
+                        }}
+                    HStack{
+                        if self.numIsSquare && self.numHasFraction{ Text("(").font(.system(size: 70))}
+                        // Number
+                        Text(self.num)
+                        
+                            .font(.system(size: 70))
+                            .lineLimit(1)
+                        // Number fraction
+                        if numHasFraction {
+                            HStack{
+                                // Number Fraction is negative
+                                if fractionIsNegative{ Text("-")}
+                                
+                                ZStack{
+                                    Text(self.numerator).offset(y: -20)
+                                    Text(self.fractionSlash).offset(y: -15)
+                                    Text(self.denominator).offset(y: 20)
+                                }
+                            }
+                            .font(.system(size: 35))
+                            .bold()
+                            .lineLimit(1)
+                        }
+                        if self.numIsSquare && self.numHasFraction{ Text(")").font(.system(size: 70))}
+                        if numIsSquare{Text(self.numPower).font(.system(size: 30)).offset(x:-5, y: -10)}
+                        if numHasUnit{Text(self.unit)}
+                    }
+                }.frame(width: .infinity)
             }
         }
     }
@@ -467,11 +542,122 @@ struct Calculator_view: View {
     func squared(){
         // Typing firt number
         if self.currOp == ""{
+            self.num1power = "2"
             self.num1IsSquare = !self.num1IsSquare
         }else{
+            self.num2power = "2"
             self.num2IsSquare = !self.num2IsSquare
         }
+        self.numPower = "2"
         self.numIsSquare = !self.numIsSquare
+        
+        rootDashClear()
+        rootDashResizer()
+    }
+    
+    func toThePower(){
+        
+        // Turning off the buttons not needed to type power
+        self.typingPower = !self.typingPower
+        // Turning on power views
+        if noNum2() && self.currOp == ""{
+            self.num1IsSquare = true
+            if self.numPower == ""{
+                self.num1power = "0"}
+        }
+        else{
+            self.num2IsSquare = true
+            if self.numPower == ""{
+                self.num2power = "0"}
+            if self.upNum2 == ""{
+                self.upNum2 = "0"
+            }
+        }
+        
+        self.numIsSquare = true
+        if self.numPower == ""{
+            self.numPower = "0"}
+        
+        rootDashClear()
+        rootDashResizer()
+    }
+    
+    func rootDashResizer(){
+        // Determining the size of the root line
+        if numSqroot{
+            
+            var count = self.num.count
+            
+            if self.numHasFraction && self.numIsSquare{
+                if self.numerator.count > self.denominator.count{
+                    count += self.numerator.count
+                }else{
+                    count += self.denominator.count
+                }
+                // Parentheses
+                count += 2
+            }
+            else if self.numHasFraction{
+                if self.numerator.count > self.denominator.count{
+                    count += self.numerator.count
+                }else{
+                    count += self.denominator.count
+                }
+            }
+            else if self.numIsSquare{
+                count += 1
+            }
+            
+            else if self.numIsNegative{
+                count += 1
+            }
+            
+            for i in 1...count{
+                // Resizing
+                self.numRootdash = "\(self.numRootdash)" + "_"
+                if noNum2() && self.currOp == ""{
+                    self.num1Rootdash = "\(self.num1Rootdash)" + "_"
+                }else{
+                    self.num2Rootdash = "\(self.num2Rootdash)" + "_"
+                }
+
+                if i % 4 == 0{
+                    self.numRootdash = "\(self.numRootdash)" + "_"
+                }
+                
+//                if i % 5 == 0{
+//                    if noNum2() && self.currOp == ""{
+//                        self.num1Rootdash = "\(self.num1Rootdash)" + "_"
+//                    }else{
+//                        self.num2Rootdash = "\(self.num2Rootdash)" + "_"
+//                    }
+//                }
+                    
+            }
+            
+            count = 0
+            
+        }else{
+            rootDashClear()
+        }
+    }
+    func rootDashClear(){
+        self.numRootdash = ""
+        if noNum2() && self.currOp == ""{
+            self.num1Rootdash = ""
+        }else{
+            self.num2Rootdash = ""
+        }
+    }
+    func sqroot(){
+        if noNum2() && self.currOp == ""{
+            self.num1Sqroot = !self.num1Sqroot
+        }else{
+            self.num2Sqroot = !self.num2Sqroot
+        }
+        self.numSqroot = !self.numSqroot
+        
+        rootDashResizer()
     }
     
     func copy(){
@@ -535,7 +721,7 @@ struct Calculator_view: View {
     }
     func plusMinus(){
         // Typing firt number
-        if self.currOp == ""{
+        if noNum2() && self.currOp == ""{
             // Number has fraction but not whole number
             if numHasFraction && num == ""{
                 // Turning negative signal off and on
@@ -578,6 +764,9 @@ struct Calculator_view: View {
                 }
             }
         }
+        
+        rootDashClear()
+        rootDashResizer()
     }
     
     func copyNumToNum1(){
@@ -590,6 +779,9 @@ struct Calculator_view: View {
         if numHasUnit{
             self.upUnit1 = self.unit
         }
+        if numIsSquare{
+            self.num1power = self.numPower
+        }
     }
     func copyNumToNum2(){
         self.upNum2 = self.num
@@ -600,6 +792,9 @@ struct Calculator_view: View {
         }
         if numHasUnit{
             self.upUnit2 = self.unit
+        }
+        if numIsSquare{
+            self.num2power = self.numPower
         }
     }
     
@@ -669,8 +864,15 @@ struct Calculator_view: View {
             self.numHasFraction = false
             self.fractionIsNegative = false
         }
+        if self.numIsSquare{
+            self.numPower = ""
+        }
+        if self.numSqroot{
+            self.numRootdash = ""
+        }
         self.numIsNegative = false
         self.numIsSquare = false
+        self.numSqroot = false
         self.num = "0"
     }
     func clearNum1(){
@@ -681,8 +883,15 @@ struct Calculator_view: View {
             self.num1HasFraction = false
             self.num1FractionIsNegative = false
         }
+        if self.num1IsSquare{
+            self.num1power = ""
+        }
+        if self.num1Sqroot{
+            self.num1Rootdash = ""
+        }
         self.num1IsNegative = false
         self.num1IsSquare = false
+        self.num1Sqroot = false
         self.upNum1 = "0"
     }
     func clearNum2(){
@@ -693,7 +902,14 @@ struct Calculator_view: View {
             self.num2HasFraction = false
             self.num2FractionIsNegative = false
         }
+        if self.num2IsSquare{
+            self.num2power = ""
+        }
+        if self.num2Sqroot{
+            self.num2Rootdash = ""
+        }
         self.num2IsSquare = false
+        self.num2Sqroot = false
         self.num2IsNegative = false
         self.upNum2 = ""
     }
@@ -746,6 +962,27 @@ struct Calculator_view: View {
             else{copyNumToNum1()}
             
             fractionButtonImageUpdater()
+        }
+        
+        else if self.typingPower{
+            if self.numPower == "0"{
+                self.numPower = ""
+                self.numIsSquare = false
+                self.typingPower = false
+                if noNum2() && self.currOp == ""{
+                    self.num1IsSquare = false
+                }else{
+                    self.num2IsSquare = false
+                }
+                
+            }else{
+                self.numPower = "0"
+            }
+            if noNum2() && self.currOp == ""{
+                copyNumToNum1()
+            }else{
+                copyNumToNum2()
+            }
         }
         
         else if self.currOp == ""{
@@ -815,6 +1052,27 @@ struct Calculator_view: View {
             }else{
                 copyNumToNum1()}
         }
+        // Deleting numbers while typing a power
+        else if typingPower{
+            // Removing char from num power
+            self.numPower.removeLast()
+            if self.numPower.isEmpty{
+                self.numPower = "0"
+            }
+            // Copying numbers
+            if noNum2() && self.currOp == ""{
+                copyNumToNum1()
+            }else{
+                copyNumToNum2()
+            }
+        // Deleting number 2 power
+        } else if self.num2IsSquare{
+            self.num2IsSquare = false
+            self.numIsSquare = false
+            self.num2power = ""
+            self.numPower = ""
+        }
+        // Deleting number 2 fration
         else if self.num2HasFraction {
             // Deleting num2 fraction
             self.upFractionNumerator2 = ""
@@ -827,10 +1085,19 @@ struct Calculator_view: View {
             self.fractionSlash = ""
             self.numHasFraction = false
         }
+        // Deleting number 2
         else if self.upNum2 != ""{
             self.upNum2.removeLast()
             self.num.removeLast()
+            if self.upNum2 == "-" || self.num == "-"{
+                self.upNum2 = ""
+                self.num = "0"
+                self.num2IsNegative = false
+                self.numIsNegative = false
+                
+            }
         }
+        // Deleting operator
         else if !self.currOp.isEmpty{
             self.currOp = ""
             if self.num1HasFraction{
@@ -841,6 +1108,14 @@ struct Calculator_view: View {
             }
             self.num = self.upNum1
         }
+        // Deleting number 1 power
+        else if self.num1IsSquare{
+            self.num1IsSquare = false
+            self.numIsSquare = false
+            self.num1power = ""
+            self.numPower = ""
+        }
+        // Deleting number 1 fraction
         else if self.num1HasFraction{
             // Deleting num1 fraction
             self.upFractionNumerator1 = ""
@@ -852,14 +1127,19 @@ struct Calculator_view: View {
             self.denominator = ""
             self.fractionSlash = ""
             self.numHasFraction = false
-        }else{
+        }
+        // Deleting number 1
+        else{
             //self.currOp = ""
             self.upNum1.removeLast()
             self.num.removeLast()
-        }
-        if self.upNum1 == "-" || self.num == "-"{
-            self.upNum1 = "0"
-            self.num = "0"
+            if self.upNum1 == "-" || self.num == "-"{
+                self.upNum1 = "0"
+                self.num = "0"
+                self.num1IsNegative = false
+                self.numIsNegative = false
+                
+            }
         }
         
         // Save guard if value is empty
@@ -867,6 +1147,9 @@ struct Calculator_view: View {
             if self.num.isEmpty && !self.numHasFraction{self.num = "0"}
             if self.upNum1.isEmpty && !self.num1HasFraction{self.upNum1 = "0"}
         }
+        
+        rootDashClear()
+        rootDashResizer()
     }
     
     func decimalPointLocator(number:String)-> Float{
@@ -885,7 +1168,7 @@ struct Calculator_view: View {
         }
         return result
     }
-    
+    // This functions sends the number 1 to the calculator class instance and it sets the operator
     func transferValue(op: String){
         
         // Safe guards against multiple opperators
@@ -914,7 +1197,10 @@ struct Calculator_view: View {
             }
             
             calc.num1 = Double(self.upNum1) ?? 0
+            
             calc.num1IsSquare = self.num1IsSquare
+            calc.num1HasRoot = self.num1Sqroot
+            calc.num1Power = Double(self.num1power) ?? 0
             
             clearNum()
             
@@ -1012,15 +1298,17 @@ struct Calculator_view: View {
         }
         
         // Calculating the square of a number
-        if self.currOp == "" && self.num1IsSquare{
+        if self.currOp == "" && noNum2(){
             // inputing the fraction
             if self.num1HasFraction{
                 calc.fraction1numerator = Int(self.upFractionNumerator1) ?? 0
                 calc.fraction1denominator = Int(self.upFractionDenominator1) ?? 0
             }
             // inputing number
-            calc.num1 = Double(self.upNum1) ?? 0
             calc.num1IsSquare = self.num1IsSquare
+            calc.num1HasRoot = self.num1Sqroot
+            calc.num1 = Double(self.upNum1) ?? 0
+            calc.num1Power = Double(self.num1power) ?? 0
             
             
             calc.resultConverter()
@@ -1051,6 +1339,8 @@ struct Calculator_view: View {
         if self.upNum2 == "" {self.upNum2 = "0"}
         calc.num2 = Double(self.upNum2) ?? 0
         calc.num2IsSquare = self.num2IsSquare
+        calc.num2HasRoot = self.num2Sqroot
+        calc.num2Power = Double(self.num2power) ?? 0
         
         
         switch self.currOp{
@@ -1143,6 +1433,15 @@ struct Calculator_view: View {
                 }
             }
             
+        else if self.typingPower{
+            // Removing one
+            if self.numPower == "0"{
+                self.numPower = ""
+            }
+            // Typing denominator
+            self.numPower = "\(self.numPower)\(number)"
+            
+        }
             else if number == "." && self.num == "0"{
                 self.num = "\(self.num)\(number)"
             }
@@ -1172,7 +1471,12 @@ struct Calculator_view: View {
             }else{
                 copyNumToNum2()
             }
+        
+        rootDashClear()
+        rootDashResizer()
+        
         }
+    
     }
     
     struct Calculator_view_Previews: PreviewProvider {
@@ -1190,13 +1494,21 @@ class Calculator{
     var fraction1numerator:Int = 0
     var fraction1denominator:Int = 0
     var num1DecimalMultiplier:Float = 0
+    var num1Power:Double = 0
     var num1IsSquare = false
+    var num1HasRoot = false
+    var numerator1Root = ""
+    var denominator1Root = ""
     
     var num2:Double = 0
     var fraction2numerator:Int = 0
     var fraction2denominator:Int = 0
     var num2DecimalMultiplier:Float = 0
+    var num2Power:Double = 0
     var num2IsSquare = false
+    var num2HasRoot = false
+    var numerator2Root = ""
+    var denominator2Root = ""
     
     var result:Double = 0
     var resultNumerator: Int = 0
@@ -1204,21 +1516,54 @@ class Calculator{
     
     var gcd = 0
     
+    func sqroot(){
+        if num1HasRoot{
+            // Number 1 fraction
+            if fraction1numerator != 0{
+                numerator1Root = String(Double(fraction1numerator).squareRoot())
+                denominator1Root = String(Double(fraction1denominator).squareRoot())
+                
+                if numerator1Root.contains(".") || denominator1Root.contains("."){
+                    num1 = (Double(numerator1Root) ?? 0) / (Double(denominator1Root) ?? 1)
+                }
+                
+            }else{
+                num1 = num1.squareRoot()
+            }
+        }
+        
+        if num2HasRoot{
+            // Number 2 fraction
+            if fraction2numerator != 0{
+                numerator2Root = String(Double(fraction2numerator).squareRoot())
+                denominator2Root = String(Double(fraction2denominator).squareRoot())
+                
+                if numerator1Root.contains(".") || denominator1Root.contains("."){
+                    num1 = (Double(numerator1Root) ?? 0) / (Double(denominator1Root) ?? 1)
+                }
+                
+            }else{
+                num2 = num2.squareRoot()
+            }
+        }
+    }
+    
+    
     // Squaring Number NOTE: Does not work on mixed numbers
-    func squareNumbers(){
+    func powerNumbers(){
         // Squaring num1
         if num1IsSquare && fraction1numerator != 0 && fraction1denominator != 0 && num1 == 0{
-            fraction1numerator = Int(pow(Double(fraction1numerator),2))
-            fraction1denominator = Int(pow(Double(fraction1denominator),2))
+            fraction1numerator = Int(pow(Double(fraction1numerator),num1Power))
+            fraction1denominator = Int(pow(Double(fraction1denominator),num1Power))
         }else if num1IsSquare{
-            num1 = pow(num1,2)
+            num1 = pow(num1,num1Power)
         }
         // Squaring num2
         if num2IsSquare && fraction2numerator != 0 && fraction2denominator != 0 && num2 == 0{
-            fraction2numerator = Int(pow(Double(fraction2numerator),2))
-            fraction2denominator = Int(pow(Double(fraction2denominator),2))
+            fraction2numerator = Int(pow(Double(fraction2numerator),num2Power))
+            fraction2denominator = Int(pow(Double(fraction2denominator),num2Power))
         }else if num2IsSquare{
-            num2 = pow(num2,2)
+            num2 = pow(num2,num2Power)
         }
     }
     
@@ -1236,15 +1581,19 @@ class Calculator{
             resultDenominator = Int(num1DecimalMultiplier)
             fractionSimplifier()
             if num1IsSquare{
-                result = pow(num1,2)
+                result = pow(num1,num1Power)
+            }
+            if num1HasRoot{
+                sqroot()
+                result = num1
             }
             
         }else{
             
             mixToFraction()
             if num1IsSquare{
-                resultNumerator = Int(pow(Double(fraction1numerator),2))
-                resultDenominator = Int(pow(Double(fraction1denominator),2))
+                resultNumerator = Int(pow(Double(fraction1numerator),num1Power))
+                resultDenominator = Int(pow(Double(fraction1denominator),num1Power))
                 result = 0
             }else{
                 result = Double(fraction1numerator) / Double(fraction1denominator)
@@ -1303,6 +1652,7 @@ class Calculator{
                 num1 = 0
             }
         }
+        
         // Accounting for fractions with a 0 numerator
         else if fraction2numerator == 0  && fraction2denominator != 0{
             fraction2numerator = 0
@@ -1355,11 +1705,15 @@ class Calculator{
         self.resultDenominator = 0
         self.num1IsSquare = false
         self.num2IsSquare = false
+        self.num1HasRoot = false
+        self.num2HasRoot = false
     }
+    
+    // Operations-----------------------------------------------------------
     func add(){
         if fraction1numerator == 0 && fraction1denominator == 0 && fraction2numerator == 0 && fraction2denominator == 0{
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             
             result = num1 + num2
         }
@@ -1369,7 +1723,7 @@ class Calculator{
             // Building improper fraction
             mixToFraction()
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             // Calculating numerator
             resultNumerator = ((fraction1numerator * fraction2denominator) + (fraction2numerator * fraction1denominator))
             // Calculating denominaor
@@ -1384,7 +1738,7 @@ class Calculator{
     func multiply(){
         if fraction1numerator == 0 && fraction1denominator == 0 && fraction2numerator == 0 && fraction2denominator == 0{
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             
             self.result = self.num1 * self.num2}
         
@@ -1394,7 +1748,7 @@ class Calculator{
             // Building improper fraction
             mixToFraction()
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             // Multiplying
             resultNumerator = fraction1numerator * fraction2numerator
             resultDenominator = fraction1denominator * fraction2denominator
@@ -1409,7 +1763,7 @@ class Calculator{
         
         if fraction1numerator == 0 && fraction1denominator == 0 && fraction2numerator == 0 && fraction2denominator == 0{
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             result = num1 - num2
         }
         else{
@@ -1418,7 +1772,7 @@ class Calculator{
             // Building improper fraction
             mixToFraction()
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             // Calculating numerator
             resultNumerator = ((fraction1numerator * fraction2denominator) - (fraction2numerator * fraction1denominator))
             // Calculating denominaor
@@ -1434,7 +1788,7 @@ class Calculator{
         if fraction1numerator == 0 && fraction1denominator == 0 && fraction2numerator == 0 && fraction2denominator == 0{
             if num2 != 0{
                 // Squaring numbers
-                squareNumbers()
+                powerNumbers()
                 result = self.num1 / self.num2}
         }
         
@@ -1444,7 +1798,7 @@ class Calculator{
             // Building improper fraction
             mixToFraction()
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             // Multiplying
             resultNumerator = fraction1numerator * fraction2denominator
             resultDenominator = fraction1denominator * fraction2numerator
@@ -1459,7 +1813,7 @@ class Calculator{
         // Processing number 1
         if fraction1numerator == 0  && fraction1denominator == 0{
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             num1IsSquare = false
             num2IsSquare = false
             num1 = num1 / 100
@@ -1467,7 +1821,7 @@ class Calculator{
             // Building improper fraction
             mixToFraction()
             // Squaring numbers
-            squareNumbers()
+            powerNumbers()
             // Getting decimal value
             num1 = Double(fraction1numerator) / Double(fraction1denominator)
             fraction1numerator = 0
