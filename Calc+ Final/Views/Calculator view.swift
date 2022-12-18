@@ -100,6 +100,8 @@ struct Calculator_view: View {
     @State var copyNumHasFraction = false
     @State var copyIsFractionNegative = false
     @State var copyNumIsSquare = false
+    @State var copyHasRoot = false
+    @State var copyRootDash = ""
     @State var numberStoredText = ""
     
     
@@ -198,7 +200,7 @@ struct Calculator_view: View {
                     
                 }, label: {Image("yardButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
-                Button(action: {transferValue(op: "÷")
+                Button(action: {copy()
                 }, label: {Image("copyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
                 Button(action: {paste()
@@ -333,7 +335,7 @@ struct Calculator_view: View {
             else if num1Sqroot{
                 Group{
                     ZStack{
-                        Text("√").font(.system(size: 40)).offset(x: 10)
+                        Text("√").font(.system(size: 40)).offset(x: 8)
                         //Text("_").font(.system(size: 40)).offset(x: 20, y: -39)
                         
                     }
@@ -390,7 +392,7 @@ struct Calculator_view: View {
                 }
                 else if num2Sqroot{
                     ZStack{
-                        Text("√").font(.system(size: 40)).offset(x: 10)
+                        Text("√").font(.system(size: 40)).offset(x: 8)
                         //Text("_").font(.system(size: 40)).offset(x: 20, y: -39)
                         
                     }
@@ -460,7 +462,7 @@ struct Calculator_view: View {
                     }
                     else if numSqroot{
                         ZStack{
-                            Text("√").font(.system(size: 60)).offset(x: 13)
+                            Text("√").font(.system(size: 60)).offset(x: 10)
                             //Text("_").font(.system(size: 60)).offset(x: 35, y: -58)
                             
                         }
@@ -540,22 +542,54 @@ struct Calculator_view: View {
     }
     
     func squared(){
+        // Keeping the result
+        if !noNum1() && noNumber(){
+            self.num = self.upNum1
+            if self.num1HasFraction{
+                self.numHasFraction = true
+                self.numerator = self.upFractionNumerator1
+                self.denominator = self.upFractionDenominator1
+                self.fractionSlash = self.upFraction1Slash
+            }
+            self.unit = self.upUnit1
+        }
+        
         // Typing firt number
         if self.currOp == ""{
-            self.num1power = "2"
             self.num1IsSquare = !self.num1IsSquare
+            if self.num1IsSquare{
+                self.num1power = "2"}
+            else{self.num1power = ""}
+            
         }else{
-            self.num2power = "2"
             self.num2IsSquare = !self.num2IsSquare
+            if self.num2IsSquare{
+                self.num2power = "2"}
+            else{self.num2power = ""}
+            
         }
-        self.numPower = "2"
         self.numIsSquare = !self.numIsSquare
+        if self.numIsSquare{
+            self.numPower = "2"}
+        else{self.numPower = ""}
+        
         
         rootDashClear()
         rootDashResizer()
     }
     
     func toThePower(){
+        // Keeping the result
+        if !noNum1() && noNumber(){
+            self.num = self.upNum1
+            if self.num1HasFraction{
+                self.numHasFraction = true
+                self.numerator = self.upFractionNumerator1
+                self.denominator = self.upFractionDenominator1
+                self.fractionSlash = self.upFraction1Slash
+            }
+            self.unit = self.upUnit1
+        }
         
         // Turning off the buttons not needed to type power
         self.typingPower = !self.typingPower
@@ -569,7 +603,7 @@ struct Calculator_view: View {
             self.num2IsSquare = true
             if self.numPower == ""{
                 self.num2power = "0"}
-            if self.upNum2 == ""{
+            if self.upNum2 == "" && !self.num2HasFraction{
                 self.upNum2 = "0"
             }
         }
@@ -650,13 +684,29 @@ struct Calculator_view: View {
         }
     }
     func sqroot(){
+        
+        // Keeping the result
+        if !noNum1() && noNumber() && self.currOp == ""{
+            self.num = self.upNum1
+            if self.num1HasFraction{
+                self.numHasFraction = true
+                self.numerator = self.upFractionNumerator1
+                self.denominator = self.upFractionDenominator1
+                self.fractionSlash = self.upFraction1Slash
+            }
+            self.unit = self.upUnit1
+        }
+        
         if noNum2() && self.currOp == ""{
             self.num1Sqroot = !self.num1Sqroot
         }else{
             self.num2Sqroot = !self.num2Sqroot
+            if self.upNum2 == ""{
+                self.upNum2 = "0"
+            }
         }
         self.numSqroot = !self.numSqroot
-        
+        rootDashClear()
         rootDashResizer()
     }
     
@@ -671,6 +721,8 @@ struct Calculator_view: View {
             self.copyIsFractionNegative = self.num1FractionIsNegative
             self.copyNumHasFraction = self.num1HasFraction
             self.copyNumIsSquare = self.num1IsSquare
+            self.copyHasRoot = self.num1Sqroot
+            self.copyRootDash = self.num1Rootdash
             self.numberStoredText = "number stored"
         }
         else if noNumber() && !noNum1() || !noNum1() && !noNum2(){
@@ -682,6 +734,8 @@ struct Calculator_view: View {
             self.copyIsFractionNegative = self.fractionIsNegative
             self.copyNumHasFraction = self.numHasFraction
             self.copyNumIsSquare = self.numIsSquare
+            self.copyHasRoot = self.numSqroot
+            self.copyRootDash = self.numRootdash
             self.numberStoredText = "number stored"
         }
     }
@@ -696,6 +750,8 @@ struct Calculator_view: View {
                 self.num1FractionIsNegative = self.copyIsFractionNegative
                 self.num1HasFraction = self.copyNumHasFraction
                 self.num1IsSquare = self.copyNumIsSquare
+                self.num1Sqroot = self.copyHasRoot
+                self.num1Rootdash = self.copyRootDash
             }
             else{
                 self.upNum2 = self.copyNum
@@ -706,7 +762,21 @@ struct Calculator_view: View {
                 self.num2FractionIsNegative = self.copyIsFractionNegative
                 self.num2HasFraction = self.copyNumHasFraction
                 self.num2IsSquare = self.copyNumIsSquare
+                self.num2Sqroot = self.copyHasRoot
+                self.num2Rootdash = self.copyRootDash
             }
+            // Pasting to num
+            self.num = self.copyNum
+            self.numerator = self.copyNumerator
+            self.denominator = self.copyDenominator
+            self.fractionSlash = self.copyFractionSlash
+            self.numIsNegative = self.copyIsNumNegative
+            self.numIsNegative = self.copyIsFractionNegative
+            self.numHasFraction = self.copyNumHasFraction
+            self.numIsSquare = self.copyNumIsSquare
+            self.numSqroot = self.copyHasRoot
+            self.numRootdash = self.copyRootDash
+            
             // Clearing memory
             self.copyNum = ""
             self.copyNumerator = ""
@@ -716,6 +786,8 @@ struct Calculator_view: View {
             self.copyIsFractionNegative = false
             self.copyNumHasFraction = false
             self.copyNumIsSquare = false
+            self.copyHasRoot = false
+            self.copyRootDash = ""
             self.numberStoredText = ""
         }
     }
@@ -853,6 +925,8 @@ struct Calculator_view: View {
         }
         
         fractionButtonImageUpdater()
+        rootDashClear()
+        rootDashResizer()
     }
     
     // Clear helper fuctions
@@ -1065,8 +1139,13 @@ struct Calculator_view: View {
             }else{
                 copyNumToNum2()
             }
+        }
+        else if self.num2Sqroot{
+            self.num2Sqroot = false
+            self.numSqroot = false
+        }
         // Deleting number 2 power
-        } else if self.num2IsSquare{
+        else if self.num2IsSquare{
             self.num2IsSquare = false
             self.numIsSquare = false
             self.num2power = ""
@@ -1107,6 +1186,10 @@ struct Calculator_view: View {
                 self.fractionSlash = self.upFraction1Slash
             }
             self.num = self.upNum1
+        }
+        else if self.num1Sqroot{
+            self.num1Sqroot = false
+            self.numSqroot = false
         }
         // Deleting number 1 power
         else if self.num1IsSquare{
@@ -1276,8 +1359,30 @@ struct Calculator_view: View {
     
     
     func equal(){
+        // Calculating the square or root of a number
+        if (self.num1Sqroot || num1IsSquare) && noNum2() && self.currOp == ""{
+            // inputing the fraction
+            if self.num1HasFraction{
+                calc.fraction1numerator = Int(self.upFractionNumerator1) ?? 0
+                calc.fraction1denominator = Int(self.upFractionDenominator1) ?? 0
+            }
+            // inputing number
+            self.calc.num1 = Double(self.upNum1) ?? 0
+            calc.num1Power = Double(self.num1power) ?? 0
+            calc.num1IsSquare = self.num1IsSquare
+            calc.num1HasRoot = self.num1Sqroot
+//            if num1Sqroot || num1IsSquare{
+//
+//
+//            }
+            
+            calc.resultConverter()
+            displayFraction()
+            displayNum()
+            calc.clear()
+        }
         // Converting result from decimal to fraction
-        if self.currOp == "" && !self.num1IsSquare{
+        else if noNum2() && self.currOp == ""{
             // inputing the fraction
             if self.num1HasFraction{
                 calc.fraction1numerator = Int(self.upFractionNumerator1) ?? 0
@@ -1297,25 +1402,7 @@ struct Calculator_view: View {
             calc.clear()
         }
         
-        // Calculating the square of a number
-        if self.currOp == "" && noNum2(){
-            // inputing the fraction
-            if self.num1HasFraction{
-                calc.fraction1numerator = Int(self.upFractionNumerator1) ?? 0
-                calc.fraction1denominator = Int(self.upFractionDenominator1) ?? 0
-            }
-            // inputing number
-            calc.num1IsSquare = self.num1IsSquare
-            calc.num1HasRoot = self.num1Sqroot
-            calc.num1 = Double(self.upNum1) ?? 0
-            calc.num1Power = Double(self.num1power) ?? 0
-            
-            
-            calc.resultConverter()
-            displayFraction()
-            displayNum()
-            calc.clear()
-        }
+        
             
         // Clearing Error
         if self.num == "Error" {self.num = "0"}
@@ -1393,6 +1480,7 @@ struct Calculator_view: View {
         clearNum()
         clearNum2()
         self.num1IsSquare = false
+        self.num1Sqroot = false
         
     }
     func buttonTaped(number: String){
@@ -1519,32 +1607,86 @@ class Calculator{
     func sqroot(){
         if num1HasRoot{
             // Number 1 fraction
-            if fraction1numerator != 0{
-                numerator1Root = String(Double(fraction1numerator).squareRoot())
-                denominator1Root = String(Double(fraction1denominator).squareRoot())
-                
-                if numerator1Root.contains(".") || denominator1Root.contains("."){
-                    num1 = (Double(numerator1Root) ?? 0) / (Double(denominator1Root) ?? 1)
-                }
-                
+            if fraction1numerator != 0 && fraction1denominator != 0{
+                num1 = Double(fraction1numerator) / Double(fraction1denominator)
+                fraction1numerator = 0
+                fraction1denominator = 0
+                num1 = num1.squareRoot()
             }else{
                 num1 = num1.squareRoot()
             }
+            num1HasRoot = false
+            
+            // Turning fraction 2 into decimal to complete calculation
+            if fraction2numerator != 0 || fraction2denominator != 0 && !num2HasRoot{
+                num2 = Double(fraction2numerator) / Double(fraction2denominator)
+                fraction2numerator = 0
+                fraction2denominator = 0
+            }
+            
+//            if fraction1numerator != 0{
+//                numerator1Root = String(Double(fraction1numerator).squareRoot())
+//                denominator1Root = String(Double(fraction1denominator).squareRoot())
+//
+//                if numerator1Root.contains(".") || denominator1Root.contains("."){
+//                    num1 = (Double(numerator1Root) ?? 0) / (Double(denominator1Root) ?? 1)
+//                    // Clean up
+//                    numerator1Root = ""
+//                    denominator1Root = ""
+//                    fraction1numerator = 0
+//                    fraction1denominator = 0
+//
+//                }
+//                else{
+//                    fraction1numerator = Int(numerator1Root) ?? 0
+//                    fraction1denominator = Int(denominator1Root) ?? 0
+//                }
+//
+//            }else{
+//                num1 = num1.squareRoot()
+//            }
         }
         
         if num2HasRoot{
             // Number 2 fraction
-            if fraction2numerator != 0{
-                numerator2Root = String(Double(fraction2numerator).squareRoot())
-                denominator2Root = String(Double(fraction2denominator).squareRoot())
-                
-                if numerator1Root.contains(".") || denominator1Root.contains("."){
-                    num1 = (Double(numerator1Root) ?? 0) / (Double(denominator1Root) ?? 1)
-                }
-                
+            if fraction2numerator != 0 && fraction2denominator != 0{
+                num2 = Double(fraction2numerator) / Double(fraction2denominator)
+                fraction2numerator = 0
+                fraction2denominator = 0
+                num2 = num2.squareRoot()
             }else{
                 num2 = num2.squareRoot()
             }
+            num2HasRoot = false
+            
+            // Turning fraction 1 into decimal to complete calculation
+            if fraction1numerator != 0 || fraction1denominator != 0 && !num1HasRoot{
+                num1 = Double(fraction1numerator) / Double(fraction1denominator)
+                fraction1numerator = 0
+                fraction1denominator = 0
+            }
+            // Number 2 fraction
+//            if fraction2numerator != 0{
+//                numerator2Root = String(Double(fraction2numerator).squareRoot())
+//                denominator2Root = String(Double(fraction2denominator).squareRoot())
+//
+//                if numerator2Root.contains(".") || denominator2Root.contains("."){
+//                    num2 = (Double(numerator2Root) ?? 0) / (Double(denominator2Root) ?? 1)
+//                    // Clean up
+//                    numerator1Root = ""
+//                    denominator1Root = ""
+//                    fraction1numerator = 0
+//                    fraction1denominator = 0
+//
+//                }
+//                else{
+//                    fraction2numerator = Int(numerator2Root) ?? 0
+//                    fraction2denominator = Int(denominator2Root) ?? 0
+//                }
+//
+//            }else{
+//                num2 = num2.squareRoot()
+//            }
         }
     }
     
@@ -1565,6 +1707,14 @@ class Calculator{
         }else if num2IsSquare{
             num2 = pow(num2,num2Power)
         }
+        // Cleaning the powers
+        if num1IsSquare{
+            num1IsSquare = false
+        }
+        else if num2IsSquare{
+            num2IsSquare = false
+        }
+    
     }
     
     // Greater common denomintor
@@ -1581,21 +1731,37 @@ class Calculator{
             resultDenominator = Int(num1DecimalMultiplier)
             fractionSimplifier()
             if num1IsSquare{
-                result = pow(num1,num1Power)
+                num1 = pow(num1,num1Power)
             }
             if num1HasRoot{
                 sqroot()
+                
+            }
+            if num1IsSquare || num1HasRoot{
+                result = num1
+            }
+        }
+        else{
+            
+            mixToFraction()
+            if num1HasRoot && !num1IsSquare{
+                sqroot()
+                result = num1
+            }
+            else if !num1HasRoot && num1IsSquare{
+                resultNumerator = Int(pow(Double(fraction1numerator),num1Power))
+                resultDenominator = Int(pow(Double(fraction1denominator),num1Power))
+            }
+            else if num1HasRoot && num1IsSquare{
+                fraction1numerator = Int(pow(Double(fraction1numerator),num1Power))
+                fraction1denominator = Int(pow(Double(fraction1denominator),num1Power))
+                
+                sqroot()
+                
                 result = num1
             }
             
-        }else{
-            
-            mixToFraction()
-            if num1IsSquare{
-                resultNumerator = Int(pow(Double(fraction1numerator),num1Power))
-                resultDenominator = Int(pow(Double(fraction1denominator),num1Power))
-                result = 0
-            }else{
+            else{
                 result = Double(fraction1numerator) / Double(fraction1denominator)
             }
             
@@ -1714,7 +1880,8 @@ class Calculator{
         if fraction1numerator == 0 && fraction1denominator == 0 && fraction2numerator == 0 && fraction2denominator == 0{
             // Squaring numbers
             powerNumbers()
-            
+            // Root square
+            sqroot()
             result = num1 + num2
         }
         else{
@@ -1724,6 +1891,28 @@ class Calculator{
             mixToFraction()
             // Squaring numbers
             powerNumbers()
+            // Root square
+            if num1HasRoot || num2HasRoot{
+                sqroot()
+                add()
+            }
+//            if fraction1numerator == 0 && fraction1denominator == 0 || fraction2numerator == 0 &&
+//                fraction2denominator == 0{
+//                // Turning remaining fractions into decimal
+//                if fraction1numerator == 0 && fraction1denominator == 0{
+//                    num2 = Double(fraction2numerator) / Double(fraction2denominator)
+//                    fraction2numerator = 0
+//                    fraction2denominator = 0
+//                    num1HasRoot = false
+//                }
+//                else if fraction2numerator == 0 && fraction2denominator == 0{
+//                    num2 = Double(fraction2numerator) / Double(fraction2denominator)
+//                    fraction1numerator = 0
+//                    fraction1denominator = 0
+//                    num2HasRoot = false
+//                }
+//                add()
+//            }
             // Calculating numerator
             resultNumerator = ((fraction1numerator * fraction2denominator) + (fraction2numerator * fraction1denominator))
             // Calculating denominaor
@@ -1739,6 +1928,8 @@ class Calculator{
         if fraction1numerator == 0 && fraction1denominator == 0 && fraction2numerator == 0 && fraction2denominator == 0{
             // Squaring numbers
             powerNumbers()
+            // Root square
+            sqroot()
             
             self.result = self.num1 * self.num2}
         
@@ -1749,6 +1940,11 @@ class Calculator{
             mixToFraction()
             // Squaring numbers
             powerNumbers()
+            // Root square
+            if num1HasRoot || num2HasRoot{
+                sqroot()
+                multiply()
+            }
             // Multiplying
             resultNumerator = fraction1numerator * fraction2numerator
             resultDenominator = fraction1denominator * fraction2denominator
@@ -1764,6 +1960,8 @@ class Calculator{
         if fraction1numerator == 0 && fraction1denominator == 0 && fraction2numerator == 0 && fraction2denominator == 0{
             // Squaring numbers
             powerNumbers()
+            // Root square
+            sqroot()
             result = num1 - num2
         }
         else{
@@ -1773,6 +1971,11 @@ class Calculator{
             mixToFraction()
             // Squaring numbers
             powerNumbers()
+            // Root square
+            if num1HasRoot || num2HasRoot{
+                sqroot()
+                substract()
+            }
             // Calculating numerator
             resultNumerator = ((fraction1numerator * fraction2denominator) - (fraction2numerator * fraction1denominator))
             // Calculating denominaor
@@ -1789,6 +1992,8 @@ class Calculator{
             if num2 != 0{
                 // Squaring numbers
                 powerNumbers()
+                // Root square
+                sqroot()
                 result = self.num1 / self.num2}
         }
         
@@ -1799,6 +2004,11 @@ class Calculator{
             mixToFraction()
             // Squaring numbers
             powerNumbers()
+            // Root square
+            if num1HasRoot || num2HasRoot{
+                sqroot()
+                divide()
+            }
             // Multiplying
             resultNumerator = fraction1numerator * fraction2denominator
             resultDenominator = fraction1denominator * fraction2numerator
