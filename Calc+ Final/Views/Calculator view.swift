@@ -92,7 +92,7 @@ struct Calculator_view: View {
     
     @State var fractionButtonImage = "emptyFractionButton"
     
-    @State var copyNum = ""
+    @State var copyNum = "0"
     @State var copyNumerator = ""
     @State var copyDenominator = ""
     @State var copyFractionSlash = ""
@@ -188,24 +188,21 @@ struct Calculator_view: View {
             .padding()
             
             HStack{
-                Button(action: {clear()
-                    
-                }, label: {Image("feetButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
-                Button(action: {clearAll()
+                Button(action: {mc()
                     
-                }, label: {Image("inchButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
+                }, label: {Image("mc").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
-                Button(action: {transferValue(op: "% of")
+                Button(action: {mPlus()
                     
-                }, label: {Image("yardButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
+                }, label: {Image("m+").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
-                Button(action: {copy()
-                }, label: {Image("copyButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
+                Button(action: {mMinus()
+                }, label: {Image("m-").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
                 
-                Button(action: {paste()
+                Button(action: {mr()
                     
-                }, label: {Image("pasteButton").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
+                }, label: {Image("mr").resizable().scaledToFit()}).opacity(typingNumerator || typingDenominator || typingPower ? 0 : 1)
             }
             
             HStack{
@@ -710,62 +707,135 @@ struct Calculator_view: View {
         rootDashResizer()
     }
     
-    func copy(){
+    // m helper functions
+    func inputNum1(){
+        // inputing num1 fraction
+        if self.num1HasFraction{
+            calc.fraction1numerator = Int(self.upFractionNumerator1) ?? 0
+            calc.fraction1denominator = Int(self.upFractionDenominator1) ?? 0
+        }
         
-        if noNum2(){
-            self.copyNum = self.upNum1
-            self.copyNumerator = self.upFractionNumerator1
-            self.copyDenominator = self.upFractionDenominator1
-            self.copyFractionSlash = self.upFraction1Slash
-            self.copyIsNumNegative = self.num1IsNegative
-            self.copyIsFractionNegative = self.num1FractionIsNegative
-            self.copyNumHasFraction = self.num1HasFraction
-            self.copyNumIsSquare = self.num1IsSquare
-            self.copyHasRoot = self.num1Sqroot
-            self.copyRootDash = self.num1Rootdash
-            self.numberStoredText = "number stored"
+        // calculating num1 decimal point location
+        if self.upNum1.contains("."){
+            calc.num1DecimalMultiplier = decimalPointLocator(number: self.upNum1)
         }
-        else if noNumber() && !noNum1() || !noNum1() && !noNum2(){
-            self.copyNum = self.num
-            self.copyNumerator = self.numerator
-            self.copyDenominator = self.denominator
-            self.copyFractionSlash = self.fractionSlash
-            self.copyIsNumNegative = self.numIsNegative
-            self.copyIsFractionNegative = self.fractionIsNegative
-            self.copyNumHasFraction = self.numHasFraction
-            self.copyNumIsSquare = self.numIsSquare
-            self.copyHasRoot = self.numSqroot
-            self.copyRootDash = self.numRootdash
-            self.numberStoredText = "number stored"
-        }
+        
+        // inputing number 1
+        self.calc.num1 = Double(self.upNum1) ?? 0
+        calc.num1Power = Double(self.num1power) ?? 0
+        calc.num1IsSquare = self.num1IsSquare
+        calc.num1HasRoot = self.num1Sqroot
     }
-    func paste(){
-        if self.numberStoredText != ""{
-            if self.currOp == ""{
-                self.upNum1 = self.copyNum
-                self.upFractionNumerator1 = self.copyNumerator
-                self.upFractionDenominator1 = self.copyDenominator
-                self.upFraction1Slash = self.copyFractionSlash
-                self.num1IsNegative = self.copyIsNumNegative
-                self.num1FractionIsNegative = self.copyIsFractionNegative
-                self.num1HasFraction = self.copyNumHasFraction
-                self.num1IsSquare = self.copyNumIsSquare
-                self.num1Sqroot = self.copyHasRoot
-                self.num1Rootdash = self.copyRootDash
-            }
-            else{
-                self.upNum2 = self.copyNum
-                self.upFractionNumerator2 = self.copyNumerator
-                self.upFractionDenominator2 = self.copyDenominator
-                self.upFraction2Slash = self.copyFractionSlash
-                self.num2IsNegative = self.copyIsNumNegative
-                self.num2FractionIsNegative = self.copyIsFractionNegative
-                self.num2HasFraction = self.copyNumHasFraction
-                self.num2IsSquare = self.copyNumIsSquare
-                self.num2Sqroot = self.copyHasRoot
-                self.num2Rootdash = self.copyRootDash
-            }
-            // Pasting to num
+    
+    func inputCopy(){
+        // inputing copy fraction
+        if self.copyNumHasFraction{
+            calc.fraction2numerator = Int(self.copyNumerator) ?? 0
+            calc.fraction2denominator = Int(self.copyDenominator) ?? 0
+        }
+        
+        // calculating num1 decimal point location
+        if self.copyNum.contains("."){
+            calc.num2DecimalMultiplier = decimalPointLocator(number: self.copyNum)
+        }
+        
+        // inputing copyNum
+        self.calc.num2 = Double(self.copyNum) ?? 0
+    }
+    
+    func inputNum(){
+        // inputing num1 fraction
+        if self.numHasFraction{
+            calc.fraction1numerator = Int(self.numerator) ?? 0
+            calc.fraction1denominator = Int(self.denominator) ?? 0
+        }
+        
+        // calculating num1 decimal point location
+        if self.num.contains("."){
+            calc.num1DecimalMultiplier = decimalPointLocator(number: self.num)
+        }
+        
+        // inputing number 1
+        self.calc.num1 = Double(self.num) ?? 0
+        calc.num1Power = Double(self.numPower) ?? 0
+        calc.num1IsSquare = self.numIsSquare
+        calc.num1HasRoot = self.numSqroot
+    }
+    
+    func copyResult(){
+        displayNum()
+        displayFraction()
+        self.copyNum = self.upNum1
+        self.copyNumerator = self.upFractionNumerator1
+        self.copyDenominator = self.upFractionDenominator1
+        self.copyFractionSlash = self.upFraction1Slash
+        self.copyIsNumNegative = self.num1IsNegative
+        self.copyIsFractionNegative = self.num1FractionIsNegative
+        self.copyNumHasFraction = self.num1HasFraction
+        clearNum1()
+    }
+    
+    func swapCopyToNum1(){
+        let tempNum = self.upNum1
+        let tempNumerator = self.upFractionNumerator1
+        let tempDenominator = self.upFractionDenominator1
+        let tempFractionSlash = self.upFraction1Slash
+        let tempIsNumNegative = self.num1IsNegative
+        let tempIsFractionNegative = self.num1FractionIsNegative
+        let tempNumHasFraction = self.num1HasFraction
+        
+        
+        self.upNum1 = self.copyNum
+        self.upFractionNumerator1 = self.copyNumerator
+        self.upFractionDenominator1 = self.copyDenominator
+        self.upFraction1Slash = self.copyFractionSlash
+        self.num1IsNegative = self.copyIsNumNegative
+        self.num1FractionIsNegative = self.copyIsFractionNegative
+        self.num1HasFraction = self.copyNumHasFraction
+        
+        self.copyNum = tempNum
+        self.copyNumerator = tempNumerator
+        self.copyDenominator = tempDenominator
+        self.copyFractionSlash = tempFractionSlash
+        self.copyIsNumNegative = tempIsNumNegative
+        self.copyIsFractionNegative = tempIsFractionNegative
+        self.copyNumHasFraction = tempNumHasFraction
+    }
+    
+    func mc(){
+        self.copyNum = "0"
+        self.copyNumerator = ""
+        self.copyDenominator = ""
+        self.copyFractionSlash = ""
+        self.copyIsNumNegative = false
+        self.copyIsFractionNegative = false
+        self.copyNumHasFraction = false
+        self.numberStoredText = ""
+    }
+    
+    func mr(){
+        if noNum2() && self.currOp == ""{
+            // display in num1
+            self.upNum1 = self.copyNum
+            self.upFractionNumerator1 = self.copyNumerator
+            self.upFractionDenominator1 = self.copyDenominator
+            self.upFraction1Slash = self.copyFractionSlash
+            self.num1IsNegative = self.copyIsNumNegative
+            self.num1FractionIsNegative = self.copyIsFractionNegative
+            self.num1HasFraction = self.copyNumHasFraction
+            
+            
+        }else{
+            // display in num2
+            self.upNum2 = self.copyNum
+            self.upFractionNumerator2 = self.copyNumerator
+            self.upFractionDenominator2 = self.copyDenominator
+            self.upFraction2Slash = self.copyFractionSlash
+            self.num2IsNegative = self.copyIsNumNegative
+            self.num2FractionIsNegative = self.copyIsFractionNegative
+            self.num2HasFraction = self.copyNumHasFraction
+        }
+        // display in num
             self.num = self.copyNum
             self.numerator = self.copyNumerator
             self.denominator = self.copyDenominator
@@ -773,24 +843,68 @@ struct Calculator_view: View {
             self.numIsNegative = self.copyIsNumNegative
             self.numIsNegative = self.copyIsFractionNegative
             self.numHasFraction = self.copyNumHasFraction
-            self.numIsSquare = self.copyNumIsSquare
-            self.numSqroot = self.copyHasRoot
-            self.numRootdash = self.copyRootDash
+    }
+    
+    func mPlus(){
+        
+        if noNum2() && self.currOp == ""{
+
+            inputNum1()
+            calc.resultConverter()
+            inputNum1()
+            inputCopy()
+            calc.add()
+            copyResult()
+            clearNum()
+
+            self.numberStoredText = "number stored"
+        }
+        else if noNumber() && !noNum1() && self.currOp == ""{
+
+            inputNum()
+            calc.resultConverter()
+            inputNum()
+            inputCopy()
+            calc.add()
+            copyResult()
+            clearNum()
+
+            self.numberStoredText = "number stored"
             
-            // Clearing memory
-            self.copyNum = ""
-            self.copyNumerator = ""
-            self.copyDenominator = ""
-            self.copyFractionSlash = ""
-            self.copyIsNumNegative = false
-            self.copyIsFractionNegative = false
-            self.copyNumHasFraction = false
-            self.copyNumIsSquare = false
-            self.copyHasRoot = false
-            self.copyRootDash = ""
-            self.numberStoredText = ""
+        }
+        
+    }
+    func mMinus(){
+        if noNum2() && self.currOp == ""{
+
+            inputNum1()
+            calc.resultConverter()
+            swapCopyToNum1()
+            inputNum1()
+            inputCopy()
+            calc.substract()
+            copyResult()
+            clearNum()
+
+            self.numberStoredText = "number stored"
+        }
+        else if noNumber() && !noNum1() && self.currOp == ""{
+
+            inputNum()
+            calc.resultConverter()
+            swapCopyToNum1()
+            inputNum()
+            inputCopy()
+            calc.substract()
+            copyResult()
+            clearNum()
+
+            self.numberStoredText = "number stored"
+            
         }
     }
+    
+    
     func plusMinus(){
         // Typing firt number
         if noNum2() && self.currOp == ""{
@@ -847,12 +961,21 @@ struct Calculator_view: View {
             self.upFractionNumerator1 = self.numerator
             self.upFraction1Slash     = self.fractionSlash
             self.upFractionDenominator1 = self.denominator
+            self.num1FractionIsNegative = self.fractionIsNegative
         }
         if numHasUnit{
             self.upUnit1 = self.unit
         }
         if numIsSquare{
             self.num1power = self.numPower
+        }
+        if numIsNegative{
+            self.num1IsNegative = self.numIsNegative
+        }
+        if numSqroot{
+            self.num1Sqroot = self.numSqroot
+            rootDashClear()
+            rootDashResizer()
         }
     }
     func copyNumToNum2(){
@@ -861,12 +984,21 @@ struct Calculator_view: View {
             self.upFractionNumerator2 = self.numerator
             self.upFraction2Slash     = self.fractionSlash
             self.upFractionDenominator2 = self.denominator
+            self.num2FractionIsNegative = self.fractionIsNegative
         }
         if numHasUnit{
             self.upUnit2 = self.unit
         }
         if numIsSquare{
             self.num2power = self.numPower
+        }
+        if numIsNegative{
+            self.num2IsNegative = self.numIsNegative
+        }
+        if numSqroot{
+            self.num2Sqroot = self.numSqroot
+            rootDashClear()
+            rootDashResizer()
         }
     }
     
@@ -895,7 +1027,11 @@ struct Calculator_view: View {
             }
 
             // Leaving just fraction if num = 0
-            if self.num == "0"{
+            if self.num == "0" || self.num == "-0"{
+                if self.num == "-0"{
+                    self.numIsNegative = false
+                    self.fractionIsNegative = true
+                }
                 self.num = ""
                 self.numerator = "0"
                 self.fractionSlash = "_"
@@ -1255,7 +1391,7 @@ struct Calculator_view: View {
     func transferValue(op: String){
         
         // Safe guards against multiple opperators
-        if self.currOp != "" {
+        if self.currOp != "" && !self.noNum2() {
             // Performing calculation if operator is tapped
             equal()
             transferValue(op: op)
@@ -1725,47 +1861,153 @@ class Calculator{
     
     // Result converter from fraction to decimal and viceversa
     func resultConverter(){
-        
-        if fraction1numerator == 0 && fraction1denominator == 0{
-            resultNumerator = Int(num1 * Double(num1DecimalMultiplier))
-            resultDenominator = Int(num1DecimalMultiplier)
-            fractionSimplifier()
-            if num1IsSquare{
-                num1 = pow(num1,num1Power)
-            }
-            if num1HasRoot{
-                sqroot()
-                
-            }
-            if num1IsSquare || num1HasRoot{
-                result = num1
-            }
-        }
-        else{
-            
+        // It is a mix number
+        if fraction1numerator != 0 && fraction1denominator != 0 && num1 != 0{
             mixToFraction()
-            if num1HasRoot && !num1IsSquare{
-                sqroot()
-                result = num1
-            }
-            else if !num1HasRoot && num1IsSquare{
-                resultNumerator = Int(pow(Double(fraction1numerator),num1Power))
-                resultDenominator = Int(pow(Double(fraction1denominator),num1Power))
-            }
-            else if num1HasRoot && num1IsSquare{
+            let gcdLocal = gcd(num1:fraction1numerator, num2:fraction1denominator)
+            fraction1numerator = fraction1numerator / gcdLocal
+            fraction1denominator = fraction1denominator / gcdLocal
+            
+            // Calculating power
+            if num1IsSquare{
                 fraction1numerator = Int(pow(Double(fraction1numerator),num1Power))
                 fraction1denominator = Int(pow(Double(fraction1denominator),num1Power))
-                
+            }
+            // Calculating root
+            if num1HasRoot{
                 sqroot()
-                
                 result = num1
+                return
             }
             
-            else{
-                result = Double(fraction1numerator) / Double(fraction1denominator)
+            // Result
+            resultNumerator = fraction1numerator
+            resultDenominator = fraction1denominator
+        }
+        // It is a fraction
+        else if fraction1numerator != 0 && fraction1denominator != 0 && num1 == 0{
+            let gcdLocal = gcd(num1:fraction1numerator, num2:fraction1denominator)
+            fraction1numerator = fraction1numerator / gcdLocal
+            fraction1denominator = fraction1denominator / gcdLocal
+            
+            // Calculating power
+            if num1IsSquare{
+                fraction1numerator = Int(pow(Double(fraction1numerator),num1Power))
+                fraction1denominator = Int(pow(Double(fraction1denominator),num1Power))
+            }
+            // Calculating root
+            if num1HasRoot{
+                sqroot()
+                result = num1
+                return
+            }
+            
+            // Result
+            if gcdLocal == 1{
+                if fraction1numerator > fraction1denominator && num1 == 0{
+                    result = Double(fraction1numerator / fraction1denominator)
+                    resultNumerator = fraction1numerator % fraction1denominator
+                    resultDenominator = fraction1denominator
+                }
+                else{
+                    resultNumerator = fraction1numerator
+                    resultDenominator = fraction1denominator
+                }
+                
+            }else{
+                resultNumerator = fraction1numerator
+                resultDenominator = fraction1denominator
             }
             
         }
+        // It is a number
+        else if fraction1numerator == 0 && fraction1denominator == 0 && num1 != 0{
+            
+            if num1DecimalMultiplier != 0{
+                fraction1numerator = Int(num1 * Double(num1DecimalMultiplier))
+                fraction1denominator = Int(num1DecimalMultiplier)
+                
+                
+                let gcdLocal = gcd(num1:fraction1numerator, num2:fraction1denominator)
+                fraction1numerator = fraction1numerator / gcdLocal
+                fraction1denominator = fraction1denominator / gcdLocal
+                
+                // Calculating power
+                if num1IsSquare{
+                    fraction1numerator = Int(pow(Double(fraction1numerator),num1Power))
+                    fraction1denominator = Int(pow(Double(fraction1denominator),num1Power))
+                }
+                // Calculating root
+                if num1HasRoot{
+                    sqroot()
+                }
+                
+                // Result
+                resultNumerator = fraction1numerator
+                resultDenominator = fraction1denominator
+            }
+            else{
+                // Calculating power
+                if num1IsSquare{
+                    num1 = pow(num1,num1Power)
+                }
+                // Calculating root
+                if num1HasRoot{
+                    sqroot()
+                }
+                result = num1
+            }
+        }
+        
+//        if fraction1numerator == 0 && fraction1denominator == 0{
+//            resultNumerator = Int(num1 * Double(num1DecimalMultiplier))
+//            resultDenominator = Int(num1DecimalMultiplier)
+//            fractionSimplifier()
+//            if num1IsSquare{
+//                num1 = pow(num1,num1Power)
+//            }
+//            if num1HasRoot{
+//                sqroot()
+//
+//            }
+//            if num1IsSquare || num1HasRoot{
+//                result = num1
+//            }
+//        }
+//        else{
+//
+//            mixToFraction()
+//            resultNumerator = fraction1numerator
+//            resultDenominator = fraction1denominator
+//            fractionSimplifier()
+//            fraction1numerator = resultNumerator
+//            fraction1denominator = resultDenominator
+//            if num1HasRoot && !num1IsSquare{
+//                sqroot()
+//                result = num1
+//            }
+//            else if !num1HasRoot && num1IsSquare{
+//                resultNumerator = Int(pow(Double(fraction1numerator),num1Power))
+//                resultDenominator = Int(pow(Double(fraction1denominator),num1Power))
+//            }
+//            else if num1HasRoot && num1IsSquare{
+//                fraction1numerator = Int(pow(Double(fraction1numerator),num1Power))
+//                fraction1denominator = Int(pow(Double(fraction1denominator),num1Power))
+//
+//                sqroot()
+//
+//                result = num1
+//            }
+//            else if gcd != 0 || gcd != 1{
+//                resultNumerator = fraction1numerator
+//                resultDenominator = fraction1denominator
+//                gcd = 0
+//            }
+//            else{
+//                result = Double(fraction1numerator) / Double(fraction1denominator)
+//            }
+//
+//        }
     }
     
     // Improper fraction builder
@@ -1835,6 +2077,7 @@ class Calculator{
     // Simplifying result
     func fractionSimplifier(){
         gcd = gcd(num1: resultNumerator, num2: resultDenominator)
+        if gcd < 0{ gcd *= -1}
         if gcd != 0{
             resultNumerator = resultNumerator / gcd
             resultDenominator = resultDenominator / gcd}
@@ -1845,10 +2088,11 @@ class Calculator{
             if resultDenominator < 0{
                 resultDenominator *= -1
             }
-        }else if resultNumerator < 0{
-            result += Double(resultNumerator / resultDenominator)
-            resultNumerator = -1 * (resultNumerator % resultDenominator)
         }
+//        else if resultNumerator < 0{
+//            result += Double(resultNumerator / resultDenominator)
+//            resultNumerator = -1 * (resultNumerator % resultDenominator)
+//        }
     }
     
     func correctingResult(){
